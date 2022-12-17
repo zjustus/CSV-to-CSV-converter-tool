@@ -1,0 +1,14 @@
+﻿<Window x:Class="SNF_Import_Creator.ErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SNF_Import_Creator"
+        mc:Ignorable="d"
+        Title="Error" Height="136" Width="288">
+    <Grid>
+        <Button Content="Close Application" HorizontalAlignment="Center" Margin="0,78,0,0" VerticalAlignment="Top" Width="268"/>
+        <Label Content="Error Something is not right" HorizontalAlignment="Center" Margin="0,34,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.396,-0.268" Width="268"/>
+
+    </Grid>
+</Window>

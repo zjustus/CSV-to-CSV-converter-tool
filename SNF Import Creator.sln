@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNF Import Creator", "SNF Import Creator\SNF Import Creator.csproj", "{A643A6B4-5C4D-4EBF-8BF4-7935F64845E7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A643A6B4-5C4D-4EBF-8BF4-7935F64845E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A643A6B4-5C4D-4EBF-8BF4-7935F64845E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A643A6B4-5C4D-4EBF-8BF4-7935F64845E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A643A6B4-5C4D-4EBF-8BF4-7935F64845E7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D1332453-68A2-448D-9C29-F68569E5AE13}
+	EndGlobalSection
+EndGlobal
