@@ -20,13 +20,60 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 ```JSON
 [
     {
-        "name":"English Service Tithes and Offerings",
-        "fund":100,
-        "account":800,
-        "subAccount":200
+        "inputName": "Notes",
+        "mode": "rename",
+        "outputName": "Cool Notes"
+    },
+    {
+        "inputName": "new Giver",
+        "mode": "remove"
+    },
+    {
+        "outputName": "OrgCode",
+        "mode": "create",
+        "value": 1
+    },
+    {
+        "inputName":"Donation Fund",
+        "mode":"transform",
+        "outputName": "out1",
+        "value":[
+            { "if": "Tithes and Offerings", "then": "oneTwoThree"},
+            { "if": "General Fund", "then": "oneTwoThree"}
+        ]
+    },
+    {
+        "inputName":"Donation Fund",
+        "mode":"transform",
+        "outputName": "out2",
+        "value":[
+            { "if": "Tithes and Offerings", "then": "oneTwoThree"},
+            { "if": "General Fund", "then": "oneTwoThree"}
+        ]
     }
 ]
 ```
+
+## Descriptions
+mode: 
+various types of transformations that can be performed on the column
+- create: adds a new column with fixed values
+- rename: just renames the column header
+- remove: removes the column in final output
+- transform: matches input values outputs
+
+inputName: the name of the column in the input
+
+outputName: [optional] the name of the output column
+
+order: [optional] the order to put the new column
+
+value:
+The output value of the column, can be fixed value or an array of if then objects
+if mode is create rename or transform
+    value can be a string or number containing the new fixed value for the column
+if mode is transform
+    value can be an array of if-then objects
 
 
 # Sources

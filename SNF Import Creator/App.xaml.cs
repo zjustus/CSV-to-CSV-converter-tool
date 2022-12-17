@@ -6,6 +6,9 @@ using System.Diagnostics; //Used for debugging
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.IO;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace SNF_Import_Creator
 {
@@ -25,11 +28,66 @@ namespace SNF_Import_Creator
              * Else launch error window
              * 
             **/
-            ErrorWindow errorWin = new ErrorWindow("No Def file found!");
-            errorWin.Show();
 
-            //MainWindow main = new MainWindow();
-            //main.Show();
+            // Get all json files
+            string currentDir = Directory.GetCurrentDirectory();
+            string[] jsonFiles = Directory.GetFiles(currentDir, "*.def.json");
+           Trace.WriteLine("Current dir: " + currentDir);
+
+            // If there are no json files
+            if(jsonFiles.Length == 0)
+            {
+                // make a stock json file
+                string[] exampleJson =
+                {
+                    "[",
+                    "    {",
+                    "        \"inputName\": \"Notes\",",
+                    "        \"mode\": \"rename\",",
+                    "        \"outputName\": \"Cool Notes\"",
+                    "    },",
+                    "    {",
+                    "        \"inputName\": \"new Giver\",",
+                    "        \"mode\": \"remove\"",
+                    "    },",
+                    "    {",
+                    "        \"outputName\": \"OrgCode\",",
+                    "        \"mode\": \"create\",",
+                    "        \"value\": 1",
+                    "    },",
+                    "    {",
+                    "        \"inputName\":\"Donation Fund\",",
+                    "        \"mode\":\"transform\",",
+                    "        \"outputName\": \"out1\",",
+                    "        \"value\":[",
+                    "            { \"if\": \"Tithes and Offerings\", \"then\": \"oneTwoThree\"},",
+                    "            { \"if\": \"General Fund\", \"then\": \"oneTwoThree\"}",
+                    "        ]",
+                    "    },",
+                    "    {",
+                    "        \"inputName\":\"Donation Fund\",",
+                    "        \"mode\":\"transform\",",
+                    "        \"outputName\": \"out2\",",
+                    "        \"value\":[",
+                    "            { \"if\": \"Tithes and Offerings\", \"then\": \"oneTwoThree\"},",
+                    "            { \"if\": \"General Fund\", \"then\": \"oneTwoThree\"}",
+                    "        ]",
+                    "    }",
+                    "]"
+                };
+                File.WriteAllLines(currentDir + "/example.def.json", exampleJson);
+
+                ErrorWindow errorWin = new ErrorWindow("No Def file found!\n An example has been created");
+                errorWin.Show();
+                return;
+            }
+            
+            Trace.WriteLine("File Found");
+            var jsonText = File.ReadAllText(jsonFiles[0]);
+            var jsonObject = JsonSerializer.Deserialize<object>(jsonText);
+
+            MainWindow main = new MainWindow();
+            main.Show();
         }
     }
 }
