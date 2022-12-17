@@ -19,9 +19,15 @@ namespace SNF_Import_Creator
     /// </summary>
     public partial class ErrorWindow : Window
     {
-        public ErrorWindow()
+        public ErrorWindow(string errorText)
         {
             InitializeComponent();
+            ErrorPrompt.Content= errorText;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
