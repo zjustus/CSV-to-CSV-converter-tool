@@ -1,6 +1,14 @@
 # Elvanto to SNF Import Tool
 This tool converts exported Elvanto Batches into an Shelby Next Financials compatible import file
 
+# TODO
+- add logic for transforms section in .def.json files
+    - an array of objects, 
+        - `{"method":"append", function: "_something"}`
+        - `{"method":"prepend", function: "something_"}`
+        - `{"method":"regClip", function: "\\"}`
+        - '{"method": "convert", function: "string"}'
+        - `{"method":"math", function: "* 100"}`
 
 # Application flow
 ## Basic usage
