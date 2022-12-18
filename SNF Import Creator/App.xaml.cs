@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Diagnostics; //Used for debugging
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.IO;
-using System.Text.Json.Serialization;
-using System.Text.Json;
+
+using System.Diagnostics; //Debugging
+using System.IO; // File Handling 
+using System.Text.Json; // JSON serialiser
 
 namespace SNF_Import_Creator
 {
@@ -81,11 +81,48 @@ namespace SNF_Import_Creator
                 errorWin.Show();
                 return;
             }
-            
-            Trace.WriteLine("File Found");
-            var jsonText = File.ReadAllText(jsonFiles[0]);
-            var jsonObject = JsonSerializer.Deserialize<object>(jsonText);
 
+            // Load the JSON, check for bad values
+            columnDef[]? columnObjects;
+            try { 
+                var jsonText = File.ReadAllText(jsonFiles[0]);
+                columnObjects = JsonSerializer.Deserialize<columnDef[]>(jsonText);
+            }
+            catch(Exception except)
+            {
+                Trace.WriteLine(except);
+                ErrorWindow errorWin = new ErrorWindow("JSON is not formatted correctly");
+                errorWin.Show();
+                return;
+            }
+
+            // check if loaded file is empty
+            if(columnObjects == null || columnObjects.Length == 0 )
+            {
+                ErrorWindow errorWin = new ErrorWindow("JSON array is empty");
+                errorWin.Show();
+                return;
+            }
+
+            // check if each column object contains any of the required fields
+            foreach(columnDef i in columnObjects)
+            {
+                if(i.inputName == null && i.outputName == null)
+                {
+                    ErrorWindow errorWin = new ErrorWindow("At Least one column definition does not contain an inputName or outputName");
+                    errorWin.Show();
+                    return;
+                }
+                // Preemptive! - this code can grab values or arrays from the value string. 
+                //if (new[] {"Number", "String"}.Contains(i.value.ValueKind.ToString()))
+                //    Trace.WriteLine(i.value);
+                //else Trace.WriteLine(i.value.ValueKind);
+            }
+
+            // save Json to application memory
+            Current.Properties.Add("columnDefs", columnObjects);
+
+            // Start the main application
             MainWindow main = new MainWindow();
             main.Show();
         }

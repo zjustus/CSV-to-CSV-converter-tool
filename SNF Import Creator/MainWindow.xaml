@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SNF_Import_Creator"
         mc:Ignorable="d"
-        Title="SNF Batch Converter" Height="450" Width="366">
+        Title="SNF Batch Converter" Height="450" Width="366"
+        AllowDrop="True"
+        Drop="fileDrop"
+        >
     <Grid>
         <Label Content="Current Dictionary File: " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227"/>
         <Button Content="Load new Dict" HorizontalAlignment="Left" Margin="242,13,0,0" VerticalAlignment="Top" Width="114"/>

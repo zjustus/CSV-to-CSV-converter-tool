@@ -21,21 +21,17 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 [
     {
         "inputName": "Notes",
-        "mode": "rename",
         "outputName": "Cool Notes"
     },
     {
         "inputName": "new Giver",
-        "mode": "remove"
     },
     {
         "outputName": "OrgCode",
-        "mode": "create",
         "value": 1
     },
     {
         "inputName":"Donation Fund",
-        "mode":"transform",
         "outputName": "out1",
         "value":[
             { "if": "Tithes and Offerings", "then": "oneTwoThree"},
@@ -44,7 +40,6 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
     },
     {
         "inputName":"Donation Fund",
-        "mode":"transform",
         "outputName": "out2",
         "value":[
             { "if": "Tithes and Offerings", "then": "oneTwoThree"},
