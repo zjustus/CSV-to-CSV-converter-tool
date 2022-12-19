@@ -19,7 +19,6 @@ namespace SNF_Import_Creator
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            Trace.WriteLine("Hi Mom");
             /**
              * TODO: check if a dict file exists in current directory
              * If file or files exist, 
@@ -83,10 +82,10 @@ namespace SNF_Import_Creator
             }
 
             // Load the JSON, check for bad values
-            columnDef[]? columnObjects;
+            ColumnDef[]? columnObjects;
             try { 
                 var jsonText = File.ReadAllText(jsonFiles[0]);
-                columnObjects = JsonSerializer.Deserialize<columnDef[]>(jsonText);
+                columnObjects = JsonSerializer.Deserialize<ColumnDef[]>(jsonText);
             }
             catch(Exception except)
             {
@@ -105,14 +104,16 @@ namespace SNF_Import_Creator
             }
 
             // check if each column object contains any of the required fields
-            foreach(columnDef i in columnObjects)
+            foreach(ColumnDef i in columnObjects)
             {
-                if(i.inputName == null && i.outputName == null)
+                if(i.InputName == null && i.OutputName == null)
                 {
                     ErrorWindow errorWin = new ErrorWindow("At Least one column definition does not contain an inputName or outputName");
                     errorWin.Show();
                     return;
                 }
+                Trace.WriteLine(i.InputName);
+                Trace.WriteLine(i.OutputName);
                 // Preemptive! - this code can grab values or arrays from the value string. 
                 //if (new[] {"Number", "String"}.Contains(i.value.ValueKind.ToString()))
                 //    Trace.WriteLine(i.value);
