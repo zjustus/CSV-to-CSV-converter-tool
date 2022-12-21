@@ -2,13 +2,22 @@
 This tool converts exported Elvanto Batches into an Shelby Next Financials compatible import file
 
 # TODO
-- add logic for transforms section in .def.json files
-    - an array of objects, 
-        - `{"method":"append", function: "_something"}`
-        - `{"method":"prepend", function: "something_"}`
-        - `{"method":"regClip", function: "\\"}`
-        - '{"method": "convert", function: "string"}'
-        - `{"method":"math", function: "* 100"}`
+- finish convert function, line 84
+- finish math function, line 89
+- restructure dif.json file to support the following
+    - make the main element an object
+    - make the existing array a property of the new object called deffinitions,
+    - add properties for the following
+        - string container charecter
+        - all data container charecter
+        - delimiter
+        - input csv has headers
+        - output csv has headers
+- Update the json load logic to compensate for the def structure changes
+- perhaps add inputDataType properties to the column structure def objects
+    - also update the class to actually use the new property
+- Update the json example code to reflect changes
+
 
 # Application flow
 ## Basic usage
