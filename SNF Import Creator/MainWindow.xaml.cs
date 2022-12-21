@@ -61,11 +61,13 @@ namespace SNF_Import_Creator
 						{
 							object value;
 
+							// Ensure population of OutputName
 							if(columnDef.InputName != null && columnDef.OutputName == null) columnDef.OutputName = columnDef.InputName;
+
+							// if input is null, skip input logic
 							if (columnDef.InputName == null) value = columnDef.Value.ToString();
 							else
 							{
-
 								value = row[columnDef.InputName];
 								// This section applies transformations on the given input and produces a transformed value
 								if(columnDef.Transformations.ValueKind == JsonValueKind.Array)
@@ -88,7 +90,8 @@ namespace SNF_Import_Creator
 												//double = double.parse(value.ToString());
 												//value = mathFunction.ParseLamda<>
 											}
-											// A transformation to append string to end of data
+
+											// appends the input with the given text
 											else if(method.GetString() == "append")
 											{
 												if(value is not string)
@@ -100,6 +103,8 @@ namespace SNF_Import_Creator
                                                 value += function.ToString();
 
 											}
+
+											// prepends the input with the given text
 											else if(method.GetString() == "prepend") 
 											{ 
 												if(value is not string)
@@ -112,10 +117,24 @@ namespace SNF_Import_Creator
 												value = function.ToString() + value;
 
                                             }
-											
 
-											// A transformation to prepend string to start of data
-											// A transformation to trim a string based on a regular expression
+											// Matches a regex string and returns only what matches
+											else if(method.GetString() == "regClip")
+											{
+                                                if (value is not string)
+                                                {
+                                                    ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                    errorWin.Show();
+                                                    return;
+                                                }
+
+												MatchCollection matches = Regex.Matches((string)value, function.ToString());
+												value = "";
+												foreach(Match match in matches)
+												{
+													value += match.Value;
+												}
+                                            }	
 										}
 									}
 								}
@@ -145,40 +164,30 @@ namespace SNF_Import_Creator
 									}
 									if (!matchFound) value = "";
 								}
-								else
+                                else if (columnDef.Value.ValueKind == JsonValueKind.Object)
+                                {
+                                    ErrorWindow errorWin = new ErrorWindow("Error!\nThe value column can not be an object");
+                                    errorWin.Show();
+                                    return;
+                                }
+                                else if(columnDef.Value.ValueKind != JsonValueKind.Undefined)
 								{
-									//Trace.WriteLine(columnDef.outputName + ": " + columnDef.value.ValueKind);
+									value = columnDef.Value.ToString();
 
 								}
 
-								// This is debug code
-								//value = "0";
-
 							}
+
+							// This merges or appends to the final CSV
 							if(outColumn.ContainsKey(columnDef.OutputName)) outColumn[columnDef.OutputName] = (string)outColumn[columnDef.OutputName] + (string)value;
 							else outColumn.Add(columnDef.OutputName, value);
 
 						}
 						output.Add(outColumn);
-						//foreach(string column in row.Keys)
-						//{
-						//    Trace.WriteLine(column);
-						//}
 					}
 
 					ListToCSV(output);
 
-
-					/* TODO: process the CSV into some kind of array of named arrays?
-					 * create output file
-					 * foreach row in csv
-					 *      for each column in DEF file
-					 *          look for matching column in CSV
-					 *              perform processing as directed in CSV
-					 *              create or APPEND to output column
-					 * if output column headers is not checked, remove column headers from output file
-					 * if quick save is not enabled prompt user where to save new file
-					 */
 				}
 
 				// if file is a def.JSON
