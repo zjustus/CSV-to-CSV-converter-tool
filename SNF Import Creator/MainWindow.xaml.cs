@@ -66,12 +66,12 @@ namespace SNF_Import_Creator
 							else
 							{
 
-                                value = row[columnDef.InputName];
+								value = row[columnDef.InputName];
 								// This section applies transformations on the given input and produces a transformed value
 								if(columnDef.Transformations.ValueKind == JsonValueKind.Array)
 								{
 									foreach (JsonElement tf in columnDef.Transformations.EnumerateArray())
-                                    {
+									{
 										if( tf.ValueKind == JsonValueKind.Object &&
 											tf.TryGetProperty("method", out JsonElement method) && 
 											tf.TryGetProperty("function", out JsonElement function))
@@ -83,31 +83,41 @@ namespace SNF_Import_Creator
 											}
 											// A transformation for a mathmatical expression, (<operator> <value>)
 											else if (method.GetString() == "math" && value is double)
-                                            {
-            //                                    string mathFunction = function.GetString();
+											{
+												//string mathFunction = function.GetString();
 												//double = double.parse(value.ToString());
 												//value = mathFunction.ParseLamda<>
 											}
 											// A transformation to append string to end of data
 											else if(method.GetString() == "append")
 											{
-												if(value is string)
+												if(value is not string)
 												{
-
+                                                    ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                    errorWin.Show();
+                                                    return;
 												}
-												else
+                                                value += function.ToString();
+
+											}
+											else if(method.GetString() == "prepend") 
+											{ 
+												if(value is not string)
 												{
                                                     ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
                                                     errorWin.Show();
                                                     return;
                                                 }
-											}
+
+												value = function.ToString() + value;
+
+                                            }
 											
 
 											// A transformation to prepend string to start of data
 											// A transformation to trim a string based on a regular expression
 										}
-                                    }
+									}
 								}
 
 
