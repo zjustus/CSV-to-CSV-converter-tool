@@ -19,14 +19,6 @@ namespace SNF_Import_Creator
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            /**
-             * TODO: check if a dict file exists in current directory
-             * If file or files exist, 
-             *  pick first one and load it in
-             *  start Main Window
-             * Else launch error window
-             * 
-            **/
 
             // Get all json files
             string currentDir = Directory.GetCurrentDirectory();
