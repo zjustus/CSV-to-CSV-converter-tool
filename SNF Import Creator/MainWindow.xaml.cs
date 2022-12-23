@@ -86,10 +86,10 @@ namespace SNF_Import_Creator
 											// A transformation for a mathmatical expression, (<operator> <value>)
 											else if (method.GetString() == "math" && value is double)
 											{
-												//string mathFunction = function.GetString();
-												//double = double.parse(value.ToString());
-												//value = mathFunction.ParseLamda<>
-											}
+												string expression = value + function.GetString();
+                                                System.Data.DataTable table = new System.Data.DataTable();
+                                                value = table.Compute(expression, "");
+                                            }
 
 											// appends the input with the given text
 											else if(method.GetString() == "append")

@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/SNF Import Creator/Batches-Dec-17-2022.csv
+/SNF Import Creator/example.def.json
