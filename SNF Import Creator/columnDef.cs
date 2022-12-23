@@ -13,10 +13,10 @@ namespace SNF_Import_Creator
 
     internal class ColumnDef
     {
-        public string InputName { get; }
-        public string OutputName { get; }
-        public JsonElement? Value { get; }
-        public List<JsonElement>? Transformations { get; }
+        public string InputName { get; set; }
+        public string OutputName { get; set; }
+        public JsonElement? Value { get; set; }
+        public List<JsonElement>? Transformations { get; set; }
 
         public ColumnDef(
             string InputName = "",
