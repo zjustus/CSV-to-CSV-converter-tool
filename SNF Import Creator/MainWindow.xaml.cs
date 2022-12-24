@@ -173,7 +173,7 @@ namespace SNF_Import_Creator
 						output.Add(outColumn);
 					}
 
-                    CsvDef.ListToCSV(output, "output.csv");
+                    csvDef.ListToCSV(output, "output.csv");
 
 				}
 

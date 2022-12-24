@@ -179,7 +179,7 @@ namespace SNF_Import_Creator
         }
 
         // TODO: Throw in some paramaters
-        public static void ListToCSV(List<Dictionary<string, object>> csv, string outputName)
+        public void ListToCSV(List<Dictionary<string, object>> csv, string outputName)
         {
             StreamWriter sw = new(outputName);
             foreach (Dictionary<string, object> column in csv)
@@ -187,7 +187,7 @@ namespace SNF_Import_Creator
                 string line = "";
                 foreach (KeyValuePair<string, object> kvp in column)
                 {
-                    line += kvp.Value + ",";
+                    line += OutputMarks + kvp.Value + OutputMarks + ",";
                 }
                 sw.WriteLine(line.TrimEnd(','));
             }
