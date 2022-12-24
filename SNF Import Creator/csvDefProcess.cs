@@ -132,10 +132,10 @@ namespace SNF_Import_Creator
         }
 
         // Returns a list of rows of a csv file. 
-        public List<Dictionary<string, object>> CSVProcess(string fileName)
+        public List<Dictionary<string, string>> CSVProcess(string fileName)
         {
             //step 1. read the CSV
-            List<Dictionary<string, object>> records = new();
+            List<Dictionary<string, string>> records = new();
             using (StreamReader reader = new(fileName))
             {
 
@@ -167,7 +167,7 @@ namespace SNF_Import_Creator
                     }
 
                     // fill the list
-                    Dictionary<string, object> record = new();
+                    Dictionary<string, string> record = new();
                     for (int i = 0; i < headers.Count; i++)
                     {
                         record[headers[i]] = values[i];

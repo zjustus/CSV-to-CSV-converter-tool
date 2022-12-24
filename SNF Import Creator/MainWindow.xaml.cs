@@ -58,16 +58,16 @@ namespace SNF_Import_Creator
 					}
 
                     List<ColumnDef>? columnObjects = csvDef.Columns;
-                    List<Dictionary<string, object>> csv = csvDef.CSVProcess(file);
+                    List<Dictionary<string, string>> csv = csvDef.CSVProcess(file);
                     List <Dictionary<string, object>> output = new();
 
 
-					foreach(Dictionary<string, object> row in csv)
+					foreach(Dictionary<string, string> row in csv)
 					{
 						Dictionary<string, object> outColumn = new();
 						foreach(ColumnDef columnDef in columnObjects)
 						{
-							object? value;
+							string? value;
 
 							// if input is null, skip input logic
 							if (string.IsNullOrEmpty(columnDef.InputName)) value = columnDef.Value.ToString();
@@ -77,68 +77,53 @@ namespace SNF_Import_Creator
 								// This section applies transformations on the given input and produces a transformed value
 								foreach (JsonElement tf in columnDef.Transformations)
 								{
-									if( tf.ValueKind == JsonValueKind.Object &&
-										tf.TryGetProperty("method", out JsonElement method) && 
-										tf.TryGetProperty("function", out JsonElement function))
+									try
 									{
-										// A transformation for datatypes
-										if(method.GetString() == "convert")
+										if (tf.ValueKind == JsonValueKind.Object &&
+											tf.TryGetProperty("method", out JsonElement method) &&
+											tf.TryGetProperty("function", out JsonElement function))
 										{
-											Trace.WriteLine("Conversion Logic should be applied");
-										}
-										// A transformation for a mathmatical expression, (<operator> <value>)
-										else if (method.GetString() == "math" && value is double)
-										{
-											string expression = value + function.GetString();
-                                            System.Data.DataTable table = new();
-                                            value = table.Compute(expression, "");
-                                        }
-
-										// appends the input with the given text
-										else if(method.GetString() == "append")
-										{
-											if(value is not string)
+											// A transformation for a mathmatical expression, (<operator> <value>)
+											if (method.GetString() == "math" && !string.IsNullOrEmpty(value))
 											{
-                                                ErrorWindow errorWin = new("Error!\nTrying to apped to a value that is not a string");
-                                                errorWin.Show();
-                                                return;
-											}
-                                            value += function.ToString();
-
-										}
-
-										// prepends the input with the given text
-										else if (method.GetString() == "prepend") 
-										{ 
-											if (value is not string)
-											{
-                                                ErrorWindow errorWin = new("Error!\nTrying to apped to a value that is not a string");
-                                                errorWin.Show();
-                                                return;
+												string expression = value + function.GetString();
+												System.Data.DataTable table = new();
+                                                value = table.Compute(expression, "").ToString();
                                             }
 
-											value = function.ToString() + value;
-
-                                        }
-
-										// Matches a regex string and returns only what matches
-										else if (method.GetString() == "regClip")
-										{
-                                            if (value is not string)
-                                            {
-                                                ErrorWindow errorWin = new("Error!\nTrying to apped to a value that is not a string");
-                                                errorWin.Show();
-                                                return;
-                                            }
-
-											MatchCollection matches = Regex.Matches((string)value, function.ToString());
-											value = "";
-											foreach (Match match in matches.Cast<Match>())
+											// appends the input with the given text
+											else if (method.GetString() == "append")
 											{
-												value += match.Value;
+												value += function.ToString();
+												throw new Exception("This feature has not yet been implemented");
+
 											}
-                                        }	
+
+											// prepends the input with the given text
+											else if (method.GetString() == "prepend")
+											{
+												value = function.ToString() + value;
+
+											}
+
+											// Matches a regex string and returns only what matches
+											else if (method.GetString() == "regClip")
+											{
+
+												MatchCollection matches = Regex.Matches((string)value, function.ToString());
+												value = "";
+												foreach (Match match in matches.Cast<Match>())
+												{
+													value += match.Value;
+												}
+											}
+										}
 									}
+									catch(Exception ex) {
+                                        ErrorWindow errorWin = new(ex.Message);
+                                        errorWin.Show();
+                                        return;
+                                    }
 								}
 
 
