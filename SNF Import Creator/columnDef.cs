@@ -19,8 +19,8 @@ namespace SNF_Import_Creator
         public List<JsonElement> Transformations { get; }
 
         public ColumnDef(
-            string InputName = "",
-            string OutputName = "",
+            string? InputName = null,
+            string? OutputName = null,
             JsonElement? Value = null,
             List<JsonElement>? Transformations = null
         ) {
@@ -83,8 +83,8 @@ namespace SNF_Import_Creator
                 Transformations = new List<JsonElement> { };
             }
 
-            this.InputName = InputName;
-            this.OutputName = OutputName;
+            this.InputName = InputName != null? InputName : "";
+            this.OutputName = OutputName != null? OutputName : "";
             this.Value = (JsonElement)Value;
             this.Transformations = Transformations;
         }

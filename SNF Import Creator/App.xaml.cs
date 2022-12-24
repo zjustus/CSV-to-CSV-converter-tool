@@ -74,42 +74,38 @@ namespace SNF_Import_Creator
             }
 
             // Load the JSON, check for bad values
-            ColumnDef[]? columnObjects;
+            List<ColumnDef> columnObjects = new();
             try { 
                 var jsonText = File.ReadAllText(jsonFiles[0]);
-                columnObjects = JsonSerializer.Deserialize<ColumnDef[]>(jsonText);
+
+                JsonElement columnJsonObjects = JsonSerializer.Deserialize<JsonElement>(jsonText);
+
+                foreach(JsonElement i in columnJsonObjects.EnumerateArray())
+                {
+                    ColumnDef x = new(
+                        i.TryGetProperty("InputName", out JsonElement InputValue) ? InputValue.GetString() : null,
+                        i.TryGetProperty("OutputName", out JsonElement Outvalue) ? Outvalue.GetString() : null,
+                        i.TryGetProperty("Value", out JsonElement theValue)? theValue : null,
+                        i.TryGetProperty("Transformations", out JsonElement theTransformations)? theTransformations.EnumerateArray().ToList() : null
+                    );
+
+                    columnObjects.Add(x);
+                }
             }
             catch(Exception except)
             {
                 Trace.WriteLine(except);
-                ErrorWindow errorWin = new ErrorWindow("JSON is not formatted correctly");
+                ErrorWindow errorWin = new ErrorWindow(except.Message);
                 errorWin.Show();
                 return;
             }
 
             // check if loaded file is empty
-            if(columnObjects == null || columnObjects.Length == 0 )
+            if(columnObjects.Count == 0 )
             {
                 ErrorWindow errorWin = new ErrorWindow("JSON array is empty");
                 errorWin.Show();
                 return;
-            }
-
-            // check if each column object contains any of the required fields
-            foreach(ColumnDef i in columnObjects)
-            {
-                if(i.InputName == null && i.OutputName == null)
-                {
-                    ErrorWindow errorWin = new ErrorWindow("At Least one column definition does not contain an inputName or outputName");
-                    errorWin.Show();
-                    return;
-                }
-                Trace.WriteLine(i.InputName);
-                Trace.WriteLine(i.OutputName);
-                // Preemptive! - this code can grab values or arrays from the value string. 
-                //if (new[] {"Number", "String"}.Contains(i.value.ValueKind.ToString()))
-                //    Trace.WriteLine(i.value);
-                //else Trace.WriteLine(i.value.ValueKind);
             }
 
             // save Json to application memory

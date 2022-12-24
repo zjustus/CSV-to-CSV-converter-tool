@@ -50,7 +50,7 @@ namespace SNF_Import_Creator
 
 					List<Dictionary<string, object>> csv = CSVProcess(file);
 
-                    ColumnDef[]? columnObjects = (ColumnDef[]?)Application.Current.Properties["columnDefs"];
+                    List<ColumnDef>? columnObjects = (List<ColumnDef>?)Application.Current.Properties["columnDefs"];
                     if (columnObjects == null)
 					{
                         ErrorWindow errorWin = new ErrorWindow("No Def file has been Loaded. \n Please Load a Def File");
@@ -69,7 +69,7 @@ namespace SNF_Import_Creator
 							object? value;
 
 							// if input is null, skip input logic
-							if (columnDef.InputName == null) value = columnDef.Value.ToString();
+							if (string.IsNullOrEmpty(columnDef.InputName)) value = columnDef.Value.ToString();
 							else
 							{
 								value = row[columnDef.InputName];
