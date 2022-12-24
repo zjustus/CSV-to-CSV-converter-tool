@@ -4,19 +4,9 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 # TODO
 - finish convert function, line 84
 - finish math function, line 89
-- restructure dif.json file to support the following
-    - make the main element an object
-    - make the existing array a property of the new object called deffinitions,
-    - add properties for the following
-        - string container charecter
-        - all data container charecter
-        - delimiter
-        - input csv has headers
-        - output csv has headers
-- Update the json load logic to compensate for the def structure changes
 - perhaps add inputDataType properties to the column structure def objects
     - also update the class to actually use the new property
-- Update the json example code to reflect changes
+- Update Example Json to show transformations
 
 
 # Application flow
@@ -35,20 +25,33 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 
 # Sample JSON definitions file
 ```JSON
-[
+{
+"Delimiter": ",",
+"TextMarks": "",
+"Marks": "\"",
+"HasHeaders": true,
+"OutputDelimiter": ",",
+"OutputTextMarks": "",
+"OutputMarks": "\"",
+"OutputHasHeaders": false,
+"Columns": [
     {
         "inputName": "Notes",
+        "mode": "rename",
         "outputName": "Cool Notes"
     },
     {
         "inputName": "new Giver",
+        "mode": "remove"
     },
     {
         "outputName": "OrgCode",
+        "mode": "create",
         "value": 1
     },
     {
         "inputName":"Donation Fund",
+        "mode":"transform",
         "outputName": "out1",
         "value":[
             { "if": "Tithes and Offerings", "then": "oneTwoThree"},
@@ -57,6 +60,7 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
     },
     {
         "inputName":"Donation Fund",
+        "mode":"transform",
         "outputName": "out2",
         "value":[
             { "if": "Tithes and Offerings", "then": "oneTwoThree"},
@@ -64,6 +68,8 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
         ]
     }
 ]
+}
+
 ```
 
 ## Descriptions
