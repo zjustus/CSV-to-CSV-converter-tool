@@ -49,7 +49,14 @@ namespace SNF_Import_Creator
 				{
 
 					List<Dictionary<string, object>> csv = CSVProcess(file);
-					ColumnDef[] columnObjects = (ColumnDef[])Application.Current.Properties["columnDefs"];
+
+                    ColumnDef[]? columnObjects = (ColumnDef[]?)Application.Current.Properties["columnDefs"];
+                    if (columnObjects == null)
+					{
+                        ErrorWindow errorWin = new ErrorWindow("No Def file has been Loaded. \n Please Load a Def File");
+                        errorWin.Show();
+                        return;
+					}
 
 					List <Dictionary<string, object>> output = new();
 
@@ -59,10 +66,7 @@ namespace SNF_Import_Creator
 						Dictionary<string, object> outColumn = new();
 						foreach(ColumnDef columnDef in columnObjects)
 						{
-							object value;
-
-							// Ensure population of OutputName
-							if(columnDef.InputName != null && columnDef.OutputName == null) columnDef.OutputName = columnDef.InputName;
+							object? value;
 
 							// if input is null, skip input logic
 							if (columnDef.InputName == null) value = columnDef.Value.ToString();
@@ -70,72 +74,69 @@ namespace SNF_Import_Creator
 							{
 								value = row[columnDef.InputName];
 								// This section applies transformations on the given input and produces a transformed value
-								if(columnDef.Transformations.ValueKind == JsonValueKind.Array)
+								foreach (JsonElement tf in columnDef.Transformations)
 								{
-									foreach (JsonElement tf in columnDef.Transformations.EnumerateArray())
+									if( tf.ValueKind == JsonValueKind.Object &&
+										tf.TryGetProperty("method", out JsonElement method) && 
+										tf.TryGetProperty("function", out JsonElement function))
 									{
-										if( tf.ValueKind == JsonValueKind.Object &&
-											tf.TryGetProperty("method", out JsonElement method) && 
-											tf.TryGetProperty("function", out JsonElement function))
+										// A transformation for datatypes
+										if(method.GetString() == "convert")
 										{
-											// A transformation for datatypes
-											if(method.GetString() == "convert")
-											{
-												Trace.WriteLine("Conversion Logic should be applied");
-											}
-											// A transformation for a mathmatical expression, (<operator> <value>)
-											else if (method.GetString() == "math" && value is double)
-											{
-												string expression = value + function.GetString();
-                                                System.Data.DataTable table = new System.Data.DataTable();
-                                                value = table.Compute(expression, "");
-                                            }
-
-											// appends the input with the given text
-											else if(method.GetString() == "append")
-											{
-												if(value is not string)
-												{
-                                                    ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
-                                                    errorWin.Show();
-                                                    return;
-												}
-                                                value += function.ToString();
-
-											}
-
-											// prepends the input with the given text
-											else if(method.GetString() == "prepend") 
-											{ 
-												if(value is not string)
-												{
-                                                    ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
-                                                    errorWin.Show();
-                                                    return;
-                                                }
-
-												value = function.ToString() + value;
-
-                                            }
-
-											// Matches a regex string and returns only what matches
-											else if(method.GetString() == "regClip")
-											{
-                                                if (value is not string)
-                                                {
-                                                    ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
-                                                    errorWin.Show();
-                                                    return;
-                                                }
-
-												MatchCollection matches = Regex.Matches((string)value, function.ToString());
-												value = "";
-												foreach(Match match in matches)
-												{
-													value += match.Value;
-												}
-                                            }	
+											Trace.WriteLine("Conversion Logic should be applied");
 										}
+										// A transformation for a mathmatical expression, (<operator> <value>)
+										else if (method.GetString() == "math" && value is double)
+										{
+											string expression = value + function.GetString();
+                                            System.Data.DataTable table = new System.Data.DataTable();
+                                            value = table.Compute(expression, "");
+                                        }
+
+										// appends the input with the given text
+										else if(method.GetString() == "append")
+										{
+											if(value is not string)
+											{
+                                                ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                errorWin.Show();
+                                                return;
+											}
+                                            value += function.ToString();
+
+										}
+
+										// prepends the input with the given text
+										else if(method.GetString() == "prepend") 
+										{ 
+											if(value is not string)
+											{
+                                                ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                errorWin.Show();
+                                                return;
+                                            }
+
+											value = function.ToString() + value;
+
+                                        }
+
+										// Matches a regex string and returns only what matches
+										else if(method.GetString() == "regClip")
+										{
+                                            if (value is not string)
+                                            {
+                                                ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                errorWin.Show();
+                                                return;
+                                            }
+
+											MatchCollection matches = Regex.Matches((string)value, function.ToString());
+											value = "";
+											foreach(Match match in matches)
+											{
+												value += match.Value;
+											}
+                                        }	
 									}
 								}
 
@@ -215,7 +216,8 @@ namespace SNF_Import_Creator
 				bool firstCase = true;
 				while (!reader.EndOfStream)
 				{
-					string[] values = reader.ReadLine().Split(",");
+					string? line = reader.ReadLine();
+					string[] values = line != null? line.Split(",") : Array.Empty<string>();
 					for(int i = 0; i < values.Length; i++)
 					{
 						if (values[i].StartsWith('"') && values[i].EndsWith('"')) values[i] = values[i].Substring(1, values[i].Length - 2);

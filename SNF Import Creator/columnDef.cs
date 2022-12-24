@@ -13,10 +13,10 @@ namespace SNF_Import_Creator
 
     internal class ColumnDef
     {
-        public string InputName { get; set; }
-        public string OutputName { get; set; }
-        public JsonElement? Value { get; set; }
-        public List<JsonElement>? Transformations { get; set; }
+        public string InputName { get; }
+        public string OutputName { get; }
+        public JsonElement Value { get; }
+        public List<JsonElement> Transformations { get; }
 
         public ColumnDef(
             string InputName = "",
@@ -34,14 +34,16 @@ namespace SNF_Import_Creator
                 OutputName = InputName;
 
             // If input is not valid and value is missing cause a problem
-            if(string.IsNullOrEmpty(InputName) && Value == null) throw new ArgumentNullException("InputName and Value can not both be empty");
+            if(Value == null) Value = new JsonElement();
+            if(string.IsNullOrEmpty(InputName) && Value.Value.ValueKind == JsonValueKind.Null) 
+                throw new ArgumentNullException("InputName and Value can not both be empty");
 
             // If value exists, make sure its not an object
-            if (Value != null && Value.Value.ValueKind == JsonValueKind.Object) 
+            if (Value.Value.ValueKind == JsonValueKind.Object) 
                 throw new ArgumentException("Value cannot be an Object. It must be a value or array of objects");
 
             // If value exists and is an array, make sure it has the correct properties.
-            if (Value != null && Value.Value.ValueKind == JsonValueKind.Array)
+            if (Value.Value.ValueKind == JsonValueKind.Array)
             {
                 foreach(JsonElement x in Value.Value.EnumerateArray())
                 {
@@ -76,10 +78,14 @@ namespace SNF_Import_Creator
                     else throw new ArgumentException("Transformations array objects must contain the properties method and function");
                 }
             }
+            else
+            {
+                Transformations = new List<JsonElement> { };
+            }
 
             this.InputName = InputName;
             this.OutputName = OutputName;
-            this.Value = Value;
+            this.Value = (JsonElement)Value;
             this.Transformations = Transformations;
         }
 
