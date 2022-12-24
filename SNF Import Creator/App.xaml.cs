@@ -31,7 +31,16 @@ namespace SNF_Import_Creator
                 // make a stock json file
                 string[] exampleJson =
                 {
-                    "[",
+                    "{",
+                    "\"Delimiter\": \",\",",
+                    "\"TextMarks\": \"\",",
+                    "\"Marks\": \"\\\"\",",
+                    "\"HasHeaders\": true,",
+                    "\"OutputDelimiter\": \",\",",
+                    "\"OutputTextMarks\": \"\",",
+                    "\"OutputMarks\": \"\\\"\",",
+                    "\"OutputHasHeaders\": false,",
+                    "\"Columns\": [",
                     "    {",
                     "        \"inputName\": \"Notes\",",
                     "        \"mode\": \"rename\",",
@@ -64,23 +73,26 @@ namespace SNF_Import_Creator
                     "            { \"if\": \"General Fund\", \"then\": \"oneTwoThree\"}",
                     "        ]",
                     "    }",
-                    "]"
+                    "]",
+                    "}"
                 };
                 File.WriteAllLines(currentDir + "/example.def.json", exampleJson);
 
-                ErrorWindow errorWin = new ErrorWindow("No Def file found!\n An example has been created");
+                ErrorWindow errorWin = new("No Def file found!\n An example has been created");
                 errorWin.Show();
                 return;
             }
 
             // Load the JSON, check for bad values
+            CsvDef defObject;
             List<ColumnDef> columnObjects = new();
             try { 
                 var jsonText = File.ReadAllText(jsonFiles[0]);
 
-                JsonElement columnJsonObjects = JsonSerializer.Deserialize<JsonElement>(jsonText);
+                JsonElement defJsonObject = JsonSerializer.Deserialize<JsonElement>(jsonText);
 
-                foreach(JsonElement i in columnJsonObjects.EnumerateArray())
+                JsonElement columnJsonObjects = defJsonObject.GetProperty("Columns");
+                foreach (JsonElement i in columnJsonObjects.EnumerateArray())
                 {
                     ColumnDef x = new(
                         i.TryGetProperty("InputName", out JsonElement InputValue) ? InputValue.GetString() : null,
@@ -91,11 +103,25 @@ namespace SNF_Import_Creator
 
                     columnObjects.Add(x);
                 }
+
+                defObject = new(
+                    columnObjects,
+                    defJsonObject.TryGetProperty("Delimiter", out JsonElement theDelimiter) ? theDelimiter.ToString() : ",",
+                    defJsonObject.TryGetProperty("TextMarks", out JsonElement theTextMarks) ? theTextMarks.ToString() : "\"",
+                    defJsonObject.TryGetProperty("Marks", out JsonElement theMarks) ? theMarks.ToString() : "",
+                    defJsonObject.TryGetProperty("HasHeaders", out JsonElement theHasHeaders) && theHasHeaders.GetBoolean(),
+                    defJsonObject.TryGetProperty("OutputDelimiter", out JsonElement theOutputDelimiter) ? theOutputDelimiter.ToString() : ",",
+                    defJsonObject.TryGetProperty("OutputTextMarks", out JsonElement theOutputTextMarks) ? theOutputTextMarks.ToString() : "\"",
+                    defJsonObject.TryGetProperty("OutputMarks ", out JsonElement theOutputMarks ) ? theOutputMarks.ToString() : "",
+                    defJsonObject.TryGetProperty("OutputHasHeaders", out JsonElement theOutputHasHeaders) && theOutputHasHeaders.GetBoolean()
+                );
+
+
             }
             catch(Exception except)
             {
                 Trace.WriteLine(except);
-                ErrorWindow errorWin = new ErrorWindow(except.Message);
+                ErrorWindow errorWin = new(except.Message);
                 errorWin.Show();
                 return;
             }
@@ -103,16 +129,17 @@ namespace SNF_Import_Creator
             // check if loaded file is empty
             if(columnObjects.Count == 0 )
             {
-                ErrorWindow errorWin = new ErrorWindow("JSON array is empty");
+                ErrorWindow errorWin = new("JSON array is empty");
                 errorWin.Show();
                 return;
             }
 
             // save Json to application memory
-            Current.Properties.Add("columnDefs", columnObjects);
+            //Current.Properties.Add("columnDefs", columnObjects);
+            Current.Properties.Add("csvDef", defObject);
 
             // Start the main application
-            MainWindow main = new MainWindow();
+            MainWindow main = new();
             main.Show();
         }
     }

@@ -31,7 +31,7 @@ namespace SNF_Import_Creator
 			InitializeComponent();
 		}
 
-		private void fileDrop(object sender, DragEventArgs e)
+		private void FileDrop(object sender, DragEventArgs e)
 		{
 
 			// get all dropped files and return if empty
@@ -48,17 +48,18 @@ namespace SNF_Import_Creator
 				if(Regex.IsMatch(file, @"\b\.csv"))
 				{
 
-					List<Dictionary<string, object>> csv = CSVProcess(file);
-
-                    List<ColumnDef>? columnObjects = (List<ColumnDef>?)Application.Current.Properties["columnDefs"];
-                    if (columnObjects == null)
+					
+                    CsvDef? csvDef = (CsvDef?)Application.Current.Properties["csvDef"];
+                    if (csvDef == null)
 					{
-                        ErrorWindow errorWin = new ErrorWindow("No Def file has been Loaded. \n Please Load a Def File");
+                        ErrorWindow errorWin = new("No Def file has been Loaded. \n Please Load a Def File");
                         errorWin.Show();
                         return;
 					}
 
-					List <Dictionary<string, object>> output = new();
+                    List<ColumnDef>? columnObjects = csvDef.Columns;
+                    List<Dictionary<string, object>> csv = csvDef.CSVProcess(file);
+                    List <Dictionary<string, object>> output = new();
 
 
 					foreach(Dictionary<string, object> row in csv)
@@ -89,7 +90,7 @@ namespace SNF_Import_Creator
 										else if (method.GetString() == "math" && value is double)
 										{
 											string expression = value + function.GetString();
-                                            System.Data.DataTable table = new System.Data.DataTable();
+                                            System.Data.DataTable table = new();
                                             value = table.Compute(expression, "");
                                         }
 
@@ -98,7 +99,7 @@ namespace SNF_Import_Creator
 										{
 											if(value is not string)
 											{
-                                                ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                ErrorWindow errorWin = new("Error!\nTrying to apped to a value that is not a string");
                                                 errorWin.Show();
                                                 return;
 											}
@@ -107,11 +108,11 @@ namespace SNF_Import_Creator
 										}
 
 										// prepends the input with the given text
-										else if(method.GetString() == "prepend") 
+										else if (method.GetString() == "prepend") 
 										{ 
-											if(value is not string)
+											if (value is not string)
 											{
-                                                ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                ErrorWindow errorWin = new("Error!\nTrying to apped to a value that is not a string");
                                                 errorWin.Show();
                                                 return;
                                             }
@@ -121,18 +122,18 @@ namespace SNF_Import_Creator
                                         }
 
 										// Matches a regex string and returns only what matches
-										else if(method.GetString() == "regClip")
+										else if (method.GetString() == "regClip")
 										{
                                             if (value is not string)
                                             {
-                                                ErrorWindow errorWin = new ErrorWindow("Error!\nTrying to apped to a value that is not a string");
+                                                ErrorWindow errorWin = new("Error!\nTrying to apped to a value that is not a string");
                                                 errorWin.Show();
                                                 return;
                                             }
 
 											MatchCollection matches = Regex.Matches((string)value, function.ToString());
 											value = "";
-											foreach(Match match in matches)
+											foreach (Match match in matches.Cast<Match>())
 											{
 												value += match.Value;
 											}
@@ -167,7 +168,7 @@ namespace SNF_Import_Creator
 								}
                                 else if (columnDef.Value.ValueKind == JsonValueKind.Object)
                                 {
-                                    ErrorWindow errorWin = new ErrorWindow("Error!\nThe value column can not be an object");
+                                    ErrorWindow errorWin = new("Error!\nThe value column can not be an object");
                                     errorWin.Show();
                                     return;
                                 }
@@ -187,7 +188,7 @@ namespace SNF_Import_Creator
 						output.Add(outColumn);
 					}
 
-					ListToCSV(output);
+                    CsvDef.ListToCSV(output, "output.csv");
 
 				}
 
@@ -198,71 +199,6 @@ namespace SNF_Import_Creator
 					Trace.WriteLine("File is def.json");
 				}
 			}
-
-		}
-
-		// Returns a list of rows of a csv file. 
-		private List<Dictionary<string, object>> CSVProcess(string fileName)
-		{
-			//step 1. read the CSV
-			List<Dictionary<string, object>> records = new();
-			using (StreamReader reader = new(fileName))
-			{
-				// TODO: make this dynamic
-				bool fileHasHeaders = true;
-
-				// logic to read or create file headers
-				List<string> headers = new();
-				bool firstCase = true;
-				while (!reader.EndOfStream)
-				{
-					string? line = reader.ReadLine();
-					string[] values = line != null? line.Split(",") : Array.Empty<string>();
-					for(int i = 0; i < values.Length; i++)
-					{
-						if (values[i].StartsWith('"') && values[i].EndsWith('"')) values[i] = values[i].Substring(1, values[i].Length - 2);
-					}
-
-					// generates headers
-					if (firstCase)
-					{
-						firstCase = false;
-						if (fileHasHeaders)
-						{
-							headers = values.ToList();
-							continue;
-						}
-						else
-						{
-							for (int i = 0; i < values.Length; i++) headers.Add(i.ToString());
-						}
-					}
-
-					// fill the list
-					Dictionary<string, object> record = new Dictionary<string, object>();
-					for (int i = 0; i < headers.Count; i++)
-					{
-						record[headers[i]] = values[i];
-					}
-					records.Add(record);
-				}
-			}
-			return records;
-		}
-
-		private void ListToCSV(List<Dictionary<string, object>> csv)
-		{
-			StreamWriter sw = new StreamWriter("output.csv");
-			foreach (Dictionary<string, object> column in csv)
-			{
-				string line = "";
-				foreach (KeyValuePair<string, object> kvp in column)
-				{
-					line += kvp.Value + ",";
-				}
-				sw.WriteLine(line.TrimEnd(','));
-			}
-			sw.Close();
 		}
 	}
 }

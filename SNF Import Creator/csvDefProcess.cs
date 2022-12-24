@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -34,8 +35,8 @@ namespace SNF_Import_Creator
                 OutputName = InputName;
 
             // If input is not valid and value is missing cause a problem
-            if(Value == null) Value = new JsonElement();
-            if(string.IsNullOrEmpty(InputName) && Value.Value.ValueKind == JsonValueKind.Null) 
+            Value ??= new JsonElement();
+            if (string.IsNullOrEmpty(InputName) && Value.Value.ValueKind == JsonValueKind.Null) 
                 throw new ArgumentNullException("InputName and Value can not both be empty");
 
             // If value exists, make sure its not an object
@@ -83,8 +84,8 @@ namespace SNF_Import_Creator
                 Transformations = new List<JsonElement> { };
             }
 
-            this.InputName = InputName != null? InputName : "";
-            this.OutputName = OutputName != null? OutputName : "";
+            this.InputName = InputName ?? "";
+            this.OutputName = OutputName ?? "";
             this.Value = (JsonElement)Value;
             this.Transformations = Transformations;
         }
@@ -95,39 +96,102 @@ namespace SNF_Import_Creator
         }
     }
 
-    internal class csvDef
+    internal class CsvDef
     {
         // TODO: include quick save?
-        public string Delimiter;
-        public string TextMarks;
-        public string? Marks;
-        public bool HasHeaders;
-        public string OutputDelimiter;
-        public string OutputTextMarks;
-        public string? OutputMarks;
-        public bool OutputHasHeaders;
-        public List<ColumnDef> Columns;
+        public string Delimiter {get;}
+        public string TextMarks {get;}
+        public string Marks {get;}
+        public bool HasHeaders {get;}
+        public string OutputDelimiter {get;}
+        public string OutputTextMarks {get;}
+        public string OutputMarks {get;}
+        public bool OutputHasHeaders {get;}
+        public List<ColumnDef> Columns { get; }
 
-        public csvDef(
+        public CsvDef(
             List<ColumnDef> Columns,
-            string Delimiter = ",",
-            string TextMarks = "'",
-            string? Marks = null,
-            bool HasHeaders = true,
-            string OutputDelimiter = "'",
-            string OutputTextMarks = "'",
-            string? OutputMarks = null,
-            bool OutputHasHeaders = true
+            string Delimiter,
+            string TextMarks,
+            string Marks,
+            bool HasHeaders,
+            string OutputDelimiter,
+            string OutputTextMarks,
+            string OutputMarks,
+            bool OutputHasHeaders
         ) {
             this.Columns = Columns;
-            this.Delimiter= Delimiter;
-            this.TextMarks= TextMarks;
-            this.Marks= Marks;
-            this.HasHeaders= HasHeaders;
-            this.OutputDelimiter= OutputDelimiter;
-            this.OutputTextMarks= OutputTextMarks;
-            this.Marks = OutputMarks;
-            this.OutputHasHeaders= OutputHasHeaders;            
+            this.Delimiter = Delimiter;
+            this.TextMarks = TextMarks;
+            this.Marks = Marks;
+            this.HasHeaders = HasHeaders;
+            this.OutputDelimiter = OutputDelimiter;
+            this.OutputTextMarks = OutputTextMarks;
+            this.OutputMarks = OutputMarks;
+            this.OutputHasHeaders = OutputHasHeaders;            
+        }
+
+        // Returns a list of rows of a csv file. 
+        public List<Dictionary<string, object>> CSVProcess(string fileName)
+        {
+            //step 1. read the CSV
+            List<Dictionary<string, object>> records = new();
+            using (StreamReader reader = new(fileName))
+            {
+
+                // logic to read or create file headers
+                List<string> headers = new();
+                bool firstCase = true;
+                while (!reader.EndOfStream)
+                {
+                    string? line = reader.ReadLine();
+                    string[] values = line != null ? line.Split(",") : Array.Empty<string>();
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        if (values[i].StartsWith('"') && values[i].EndsWith('"')) values[i] = values[i].Substring(1, values[i].Length - 2);
+                    }
+
+                    // generates headers
+                    if (firstCase)
+                    {
+                        firstCase = false;
+                        if (HasHeaders)
+                        {
+                            headers = values.ToList();
+                            continue;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < values.Length; i++) headers.Add(i.ToString());
+                        }
+                    }
+
+                    // fill the list
+                    Dictionary<string, object> record = new();
+                    for (int i = 0; i < headers.Count; i++)
+                    {
+                        record[headers[i]] = values[i];
+                    }
+                    records.Add(record);
+                }
+            }
+            return records;
+        }
+
+        // TODO: Throw in some paramaters
+        public static void ListToCSV(List<Dictionary<string, object>> csv, string outputName)
+        {
+            StreamWriter sw = new(outputName);
+            foreach (Dictionary<string, object> column in csv)
+            {
+                string line = "";
+                foreach (KeyValuePair<string, object> kvp in column)
+                {
+                    line += kvp.Value + ",";
+                }
+                sw.WriteLine(line.TrimEnd(','));
+            }
+            sw.Close();
         }
     }
 }
