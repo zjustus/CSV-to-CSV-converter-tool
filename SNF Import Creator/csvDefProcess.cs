@@ -179,9 +179,10 @@ namespace SNF_Import_Creator
         }
 
         // TODO: Throw in some paramaters
-        public void ListToCSV(List<Dictionary<string, object>> csv, string outputName)
+        // TODO: change from object to something else...
+        public string ListToCSV(List<Dictionary<string, object>> csv)
         {
-            StreamWriter sw = new(outputName);
+            string Output = "";
             foreach (Dictionary<string, object> column in csv)
             {
                 string line = "";
@@ -189,9 +190,23 @@ namespace SNF_Import_Creator
                 {
                     line += OutputMarks + kvp.Value + OutputMarks + ",";
                 }
-                sw.WriteLine(line.TrimEnd(','));
+                Output += line.TrimEnd(',') + "\n";
             }
-            sw.Close();
+
+            return Output;
+
+            // Old code
+            //StreamWriter sw = new(outputName);
+            //foreach (Dictionary<string, object> column in csv)
+            //{
+            //    string line = "";
+            //    foreach (KeyValuePair<string, object> kvp in column)
+            //    {
+            //        line += OutputMarks + kvp.Value + OutputMarks + ",";
+            //    }
+            //    sw.WriteLine(line.TrimEnd(','));
+            //}
+            //sw.Close();
         }
     }
 }

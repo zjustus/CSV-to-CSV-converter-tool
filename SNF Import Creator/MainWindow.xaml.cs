@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -173,8 +174,16 @@ namespace SNF_Import_Creator
 						output.Add(outColumn);
 					}
 
-                    csvDef.ListToCSV(output, "output.csv");
+                    string ccsvOut = csvDef.ListToCSV(output);
+					SaveFileDialog saveDialog = new();
+					saveDialog.FileName = file;
+					saveDialog.DefaultExt = "csv";
+                    saveDialog.Filter = "CSV files (*.csv)|*.csv|Text files (*.txt)|*.txt|All files (*.*)|*.*";
+					bool isValid = saveDialog.ShowDialog() ?? false;
 
+					if (isValid) {
+						File.WriteAllText(saveDialog.FileName, ccsvOut);
+					}
 				}
 
 				// if file is a def.JSON
