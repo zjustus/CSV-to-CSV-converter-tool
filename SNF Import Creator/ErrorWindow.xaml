@@ -8,7 +8,7 @@
         Title="Error" Height="136" Width="288">
     <Grid>
         <Button Content="Close Application" HorizontalAlignment="Center" Margin="0,78,0,0" VerticalAlignment="Top" Width="268" Click="Button_Click"/>
-        <Label x:Name="ErrorPrompt" Content="Error Something is not right" HorizontalAlignment="Center" Margin="0,34,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.396,-0.268" Width="268"/>
+        <Label x:Name="ErrorPrompt" Content="Error Something is not right" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.396,-0.268" Width="268" Height="50"/>
 
     </Grid>
 </Window>
