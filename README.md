@@ -1,14 +1,6 @@
 # Elvanto to SNF Import Tool
 This tool converts exported Elvanto Batches into an Shelby Next Financials compatible import file
 
-# TODO
-- finish convert function, line 84
-- finish math function, line 89
-- perhaps add inputDataType properties to the column structure def objects
-    - also update the class to actually use the new property
-- Update Example Json to show transformations
-
-
 # Application flow
 ## Basic usage
 - on launch, if the tool does not find a JSON file containing definitions for SNF the tool will create a basic template file and close with a warning prompting you to update this file
@@ -27,31 +19,25 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 ```JSON
 {
 "Delimiter": ",",
-"TextMarks": "",
 "Marks": "\"",
 "HasHeaders": true,
 "OutputDelimiter": ",",
-"OutputTextMarks": "",
 "OutputMarks": "\"",
 "OutputHasHeaders": false,
 "Columns": [
     {
         "inputName": "Notes",
-        "mode": "rename",
         "outputName": "Cool Notes"
     },
     {
         "inputName": "new Giver",
-        "mode": "remove"
     },
     {
         "outputName": "OrgCode",
-        "mode": "create",
         "value": 1
     },
     {
         "inputName":"Donation Fund",
-        "mode":"transform",
         "outputName": "out1",
         "value":[
             { "if": "Tithes and Offerings", "then": "oneTwoThree"},
@@ -60,31 +46,37 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
     },
     {
         "inputName":"Donation Fund",
-        "mode":"transform",
         "outputName": "out2",
         "value":[
             { "if": "Tithes and Offerings", "then": "oneTwoThree"},
             { "if": "General Fund", "then": "oneTwoThree"}
         ]
-    }
+    },
+    {
+           "InputName": "Amount",
+           "Transformations": [
+               { "method": "math", "function": " * 100"},
+               { "method": "regClip", "function": "^[^.]*"}
+           ]
+     }
 ]
 }
 
 ```
 
 ## Descriptions
-mode: 
-various types of transformations that can be performed on the column
-- create: adds a new column with fixed values
-- rename: just renames the column header
-- remove: removes the column in final output
-- transform: matches input values outputs
-
 inputName: the name of the column in the input
 
 outputName: [optional] the name of the output column
 
-order: [optional] the order to put the new column
+transformations: [optional]
+The transformations define how an input value should be manipulated before final output
+it is applied before value replacement.  
+The following is a list of methods that can be used
+    math: applies math to the value, must be in the format {"method": "math", "function": "{math function here}"}
+    append: appends text to the end of the input {"method": "append", "function": "End of Line"}
+    prepend: prepends text to the begining of the input {"method": "prepend", "function": "Start of Line"}
+    regclip: selects only particular parts of text and ignores everything else {"method": "regclip", "function": "^[^.]*"}
 
 value:
 The output value of the column, can be fixed value or an array of if then objects

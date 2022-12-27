@@ -161,7 +161,6 @@ namespace SNF_Import_Creator
                                 else if(columnDef.Value.ValueKind != JsonValueKind.Undefined)
 								{
 									value = columnDef.Value.ToString();
-
 								}
 
 							}
@@ -176,7 +175,7 @@ namespace SNF_Import_Creator
 
                     string ccsvOut = csvDef.ListToCSV(output);
 					SaveFileDialog saveDialog = new();
-					saveDialog.FileName = file;
+					saveDialog.FileName = Regex.Match(file, @"(?<=\\)[^\\]*$").Value;
 					saveDialog.DefaultExt = "csv";
                     saveDialog.Filter = "CSV files (*.csv)|*.csv|Text files (*.txt)|*.txt|All files (*.*)|*.*";
 					bool isValid = saveDialog.ShowDialog() ?? false;

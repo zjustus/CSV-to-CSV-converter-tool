@@ -112,21 +112,17 @@ namespace SNF_Import_Creator
         public CsvDef(
             List<ColumnDef> Columns,
             string Delimiter,
-            string TextMarks,
             string Marks,
             bool HasHeaders,
             string OutputDelimiter,
-            string OutputTextMarks,
             string OutputMarks,
             bool OutputHasHeaders
         ) {
             this.Columns = Columns;
             this.Delimiter = Delimiter;
-            this.TextMarks = TextMarks;
             this.Marks = Marks;
             this.HasHeaders = HasHeaders;
             this.OutputDelimiter = OutputDelimiter;
-            this.OutputTextMarks = OutputTextMarks;
             this.OutputMarks = OutputMarks;
             this.OutputHasHeaders = OutputHasHeaders;            
         }
@@ -188,7 +184,7 @@ namespace SNF_Import_Creator
                 string line = "";
                 foreach (KeyValuePair<string, object> kvp in column)
                 {
-                    line += OutputMarks + kvp.Value + OutputMarks + ",";
+                    line += OutputMarks + kvp.Value + OutputMarks + OutputDelimiter;
                 }
                 Output += line.TrimEnd(',') + "\n";
             }
