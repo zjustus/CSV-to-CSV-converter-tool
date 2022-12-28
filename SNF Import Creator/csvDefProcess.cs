@@ -100,11 +100,9 @@ namespace SNF_Import_Creator
     {
         // TODO: include quick save?
         public string Delimiter {get;}
-        public string TextMarks {get;}
         public string Marks {get;}
         public bool HasHeaders {get;}
         public string OutputDelimiter {get;}
-        public string OutputTextMarks {get;}
         public string OutputMarks {get;}
         public bool OutputHasHeaders {get;}
         public List<ColumnDef> Columns { get; }
