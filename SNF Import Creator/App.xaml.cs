@@ -44,7 +44,7 @@ namespace SNF_Import_Creator
                     "        \"outputName\": \"Cool Notes\"",
                     "    },",
                     "    {",
-                    "        \"inputName\": \"new Giver\"",
+                    "        \"inputName\": \"new Giver\",",
                     "    },",
                     "    {",
                     "        \"outputName\": \"OrgCode\",",
