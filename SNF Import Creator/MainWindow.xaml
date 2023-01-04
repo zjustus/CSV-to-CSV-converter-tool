@@ -10,8 +10,7 @@
         Drop="FileDrop"
         >
     <Grid>
-        <Label Content="Current Dictionary File: " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227"/>
-        <Button Content="Load new Dict" HorizontalAlignment="Left" Margin="242,13,0,0" VerticalAlignment="Top" Width="114"/>
         <Rectangle HorizontalAlignment="Center" Height="349" Margin="0,75,0,0" Stroke="Black" VerticalAlignment="Top" Width="346"/>
+        <TextBlock HorizontalAlignment="Center" Margin="0,30,0,0" TextWrapping="Wrap" Text="Drag n Drop Files into this window" VerticalAlignment="Top" Width="346"/>
     </Grid>
 </Window>
