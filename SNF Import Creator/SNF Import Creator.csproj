@@ -6,6 +6,12 @@
     <RootNamespace>SNF_Import_Creator</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <NoWin32Manifest>true</NoWin32Manifest>
+    <ApplicationIcon>CSV Converter Icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="CSV Converter Icon.ico" />
+  </ItemGroup>
 
 </Project>
