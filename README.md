@@ -4,87 +4,106 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 # Application flow
 ## Basic usage
 - on launch, if the tool does not find a JSON file containing definitions for SNF the tool will create a basic template file and close with a warning prompting you to update this file
-- on launch, the tool also creates an output and processed directory in the current directory if one does not exist already
-- on launch, if the tool sees pre-existing .csv files, it will ask if the users wants these files imported. if not, it will ignore them till next launch
-- while running, the tool watches its current directory looking for any new .csv files, when one is found it will immediately process the file placing the new file in the output directory and the processed file into the processed directory
-- The tool also features a drag n drop interface that will allow the user to drop one or more .csv files into the application and it will process them placing the new file in the output directory and the processed file into the processed directory. 
+- Drag and drop one or many csv file into the main window to begin the conversion process. 
 
 ## Advanced notes
-- If multiple JSON files exist in the applications directory it will load all and merge in memory, it will crash if merge conflicts exist
-  - This is to help organization as the definitions lists could get very long over time
-- If an active JSON definitions file is modified durning execution, a warning will appear asking the user to continue with old definitions or update using new information
-  - Like above, if a merge conflict exists, it will crash
+- If multiple JSON files exist in the applications directory it will load only the first one on startup. make sure only one exists.
+
+## Json Sections
+- Delimiter - what separates the columns
+- TextMarks - Are there quotations around text filed, what are they?
+- Marks - Are there quotations around every field, what are they?
+- HasHeaders - Does the CSV file have headers - if none are present, a number is assigned as its inputName
+- OutputDelimiter - what separates the output columns
+- OutputTextMarks - should there be quotations around text fields, what are they?
+- OutputMarks - should there be quotations around every field, what are they?
+- OutputHasHeaders - should the output have headers?
+- Columns - A list of objects describing each OUTPUT column and how to generate it.
+
+Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file
+
+
+# Column parameters
+InputName:  
+The input name is the name of the input column the produced value is derived from.  
+If columns do not contain a header, the input name is assigned as a number starting from 0.  
+It is required if there are transformations.  
+It is required if there is if then logic in the value field.  
+It is not required if the produced value is not dependent on an input. 
+
+OutputName:  
+The Output Name is the name of the output column produced.  
+It is not required if the InputName is given.  
+
+Transformations:  
+Transformations is an array of set rules on how to process the input column value.  
+Each transformation must contain a method and a function value dictating what type of transformation it is, and how to perform it
+Transformations are performed before value logic and require an inputName to be present.  
+The following is a list of methods that can be used.  
+  - math: applies math to the value - {"method": "math", "function": "{ * 100}"}
+  - append: appends text to the end of the input - {"method": "append", "function": "End of Line"}
+  - prepend: prepends text to the beginning of the input - {"method": "prepend", "function": "Start of Line "}
+  - regclip: selects only particular parts of text and ignores everything else - {"method": "regclip", "function": "^[^.]*"}
+
+
+value:  
+The value parameter defines a fixed output or a type of "if then" lookup logic to determine the final value.  
+It is applied after transformations take place.  
+It is not required if an InputName is given.  
+The value parameter can be a string  
+The value parameter can be a list containing the if then objects that determine the final output.  
+
+
 
 # Sample JSON definitions file
 ```JSON
 {
 "Delimiter": ",",
+"TextMarks": "",
 "Marks": "\"",
 "HasHeaders": true,
 "OutputDelimiter": ",",
+"OutputTextMarks": "",
 "OutputMarks": "\"",
 "OutputHasHeaders": false,
 "Columns": [
-    {
-        "inputName": "Notes",
-        "outputName": "Cool Notes"
-    },
-    {
-        "inputName": "new Giver",
-    },
-    {
-        "outputName": "OrgCode",
-        "value": 1
-    },
-    {
-        "inputName":"Donation Fund",
-        "outputName": "out1",
-        "value":[
-            { "if": "Tithes and Offerings", "then": "oneTwoThree"},
-            { "if": "General Fund", "then": "oneTwoThree"}
-        ]
-    },
-    {
-        "inputName":"Donation Fund",
-        "outputName": "out2",
-        "value":[
-            { "if": "Tithes and Offerings", "then": "oneTwoThree"},
-            { "if": "General Fund", "then": "oneTwoThree"}
-        ]
-    },
-    {
-           "InputName": "Amount",
-           "Transformations": [
-               { "method": "math", "function": " * 100"},
-               { "method": "regClip", "function": "^[^.]*"}
-           ]
-     }
+	{
+		"InputName": "Notes",
+		"OutputName": "Cool Notes"
+	},
+	{
+		"InputName": "new Giver",
+	},
+	{
+		"OutputName": "OrgCode",
+		"value": 1
+	},
+	{
+		"InputName":"Donation Fund",
+		"OutputName": "out1",
+		"value":[
+			{ "if": "Tithes and Offerings", "then": "oneTwoThree"},
+			{ "if": "General Fund", "then": "oneTwoThree"}
+		]
+	},
+	{
+		"InputName":"Donation Fund",
+		"OutputName": "out2",
+		"value":[
+			{ "if": "Tithes and Offerings", "then": "oneTwoThree"},
+			{ "if": "General Fund", "then": "oneTwoThree"}
+		]
+	},
+	{
+		"InputName": "Amount",
+		"Transformations": [
+			{ "method": "math", "function": " * 100"},
+			{ "method": "regClip", "function": "^[^.]*"}
+		]
+	}
 ]
 }
-
 ```
-
-## Descriptions
-inputName: the name of the column in the input
-
-outputName: [optional] the name of the output column
-
-transformations: [optional]
-The transformations define how an input value should be manipulated before final output
-it is applied before value replacement.  
-The following is a list of methods that can be used
-    math: applies math to the value, must be in the format {"method": "math", "function": "{math function here}"}
-    append: appends text to the end of the input {"method": "append", "function": "End of Line"}
-    prepend: prepends text to the begining of the input {"method": "prepend", "function": "Start of Line"}
-    regclip: selects only particular parts of text and ignores everything else {"method": "regclip", "function": "^[^.]*"}
-
-value:
-The output value of the column, can be fixed value or an array of if then objects
-if mode is create rename or transform
-    value can be a string or number containing the new fixed value for the column
-if mode is transform
-    value can be an array of if-then objects
-
 
 # Sources
 - Read data from JSON files - https://learn.microsoft.com/en-us/answers/questions/699941/read-and-process-json-file-with-c.html
