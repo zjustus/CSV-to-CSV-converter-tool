@@ -99,6 +99,7 @@ namespace SNF_Import_Creator
     internal class CsvDef
     {
         // TODO: include quick save?
+        public string DefTitle { get; }
         public string Delimiter {get;}
         public string Marks {get;}
         public bool HasHeaders {get;}
@@ -109,6 +110,7 @@ namespace SNF_Import_Creator
 
         public CsvDef(
             List<ColumnDef> Columns,
+            string DefTitle,
             string Delimiter,
             string Marks,
             bool HasHeaders,
@@ -117,6 +119,7 @@ namespace SNF_Import_Creator
             bool OutputHasHeaders
         ) {
             this.Columns = Columns;
+            this.DefTitle= DefTitle;
             this.Delimiter = Delimiter;
             this.Marks = Marks;
             this.HasHeaders = HasHeaders;

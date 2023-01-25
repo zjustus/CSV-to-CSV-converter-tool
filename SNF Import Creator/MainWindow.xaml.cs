@@ -30,7 +30,9 @@ namespace SNF_Import_Creator
 		public MainWindow()
 		{
 			InitializeComponent();
-		}
+            CsvDef? csvDef = (CsvDef?)Application.Current.Properties["csvDef"];
+			if (csvDef != null) label_defTitle.Content = csvDef.DefTitle;
+        }
 
 		private void FileDrop(object sender, DragEventArgs e)
 		{
@@ -105,8 +107,6 @@ namespace SNF_Import_Creator
 											else if (method.GetString() == "append")
 											{
 												value += function.ToString();
-												throw new Exception("This feature has not yet been implemented");
-
 											}
 
 											// prepends the input with the given text
@@ -206,10 +206,21 @@ namespace SNF_Import_Creator
 				// if file is a def.JSON
 				else if(Regex.IsMatch(file, @"\b\.def\.json"))
 				{
-					// TODO: process json and update def with new file
-					Trace.WriteLine("File is def.json");
+                    try
+                    {
+                        CsvDef? defObject = jsonProceess.processJSON(file);
+						Application.Current.Properties["csvDef"] = defObject;
+						if (defObject != null) label_defTitle.Content = defObject.DefTitle;
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorWindow errorWin = new(ex.Message);
+                        errorWin.Show();
+                        return;
+                    }
+
 				}
 			}
 		}
-	}
+    }
 }

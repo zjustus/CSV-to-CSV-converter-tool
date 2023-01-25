@@ -11,6 +11,7 @@
         >
     <Grid>
         <Rectangle HorizontalAlignment="Center" Height="349" Margin="0,75,0,0" Stroke="Black" VerticalAlignment="Top" Width="346"/>
-        <TextBlock HorizontalAlignment="Center" Margin="0,30,0,0" TextWrapping="Wrap" Text="Drag n Drop Files into this window" VerticalAlignment="Top" Width="346"/>
+        <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Text="Drag n Drop Files into this window" VerticalAlignment="Top" Width="346"/>
+        <Label x:Name="label_defTitle" Content="Def Title" HorizontalAlignment="Center" Margin="0,31,0,0" VerticalAlignment="Top" Width="346"/>
     </Grid>
 </Window>

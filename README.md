@@ -58,6 +58,7 @@ The value parameter can be a list containing the if then objects that determine 
 # Sample JSON definitions file
 ```JSON
 {
+"DefTitle": "Cool Transformation",
 "Delimiter": ",",
 "TextMarks": "",
 "Marks": "\"",

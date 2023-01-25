@@ -32,6 +32,7 @@ namespace SNF_Import_Creator
                 string[] exampleJson =
                 {
                     "{",
+                    "\"DefTitle\": \"Cool Conversion\",",
                     "\"Delimiter\": \",\",",
                     "\"Marks\": \"\\\"\",",
                     "\"HasHeaders\": true,",
@@ -63,7 +64,8 @@ namespace SNF_Import_Creator
                     "        \"OutputName\": \"out2\",",
                     "        \"Value\":[",
                     "            { \"if\": \"Tithes and Offerings\", \"then\": \"oneTwoThree\"},",
-                    "            { \"if\": \"General Fund\", \"then\": \"oneTwoThree\"}",
+                    "            { \"if\": \"General Fund\", \"then\": \"oneTwoThree\"},",
+                    "            { \"else\": \"Missions\" }",
                     "        ]",
                     "    },",
                     "    {",
@@ -84,57 +86,20 @@ namespace SNF_Import_Creator
             }
 
             // Load the JSON, check for bad values
-            CsvDef defObject;
-            List<ColumnDef> columnObjects = new();
-            try { 
-                var jsonText = File.ReadAllText(jsonFiles[0]);
-
-                JsonElement defJsonObject = JsonSerializer.Deserialize<JsonElement>(jsonText);
-
-                JsonElement columnJsonObjects = defJsonObject.GetProperty("Columns");
-                foreach (JsonElement i in columnJsonObjects.EnumerateArray())
-                {
-                    ColumnDef x = new(
-                        i.TryGetProperty("InputName", out JsonElement InputValue) ? InputValue.GetString() : null,
-                        i.TryGetProperty("OutputName", out JsonElement Outvalue) ? Outvalue.GetString() : null,
-                        i.TryGetProperty("Value", out JsonElement theValue)? theValue : null,
-                        i.TryGetProperty("Transformations", out JsonElement theTransformations)? theTransformations.EnumerateArray().ToList() : null
-                    );
-
-                    columnObjects.Add(x);
-                }
-
-                defObject = new(
-                    columnObjects,
-                    defJsonObject.TryGetProperty("Delimiter", out JsonElement theDelimiter) ? theDelimiter.ToString() : ",",
-                    defJsonObject.TryGetProperty("Marks", out JsonElement theMarks) ? theMarks.ToString() : "",
-                    defJsonObject.TryGetProperty("HasHeaders", out JsonElement theHasHeaders) && theHasHeaders.GetBoolean(),
-                    defJsonObject.TryGetProperty("OutputDelimiter", out JsonElement theOutputDelimiter) ? theOutputDelimiter.ToString() : ",",
-                    defJsonObject.TryGetProperty("OutputMarks", out JsonElement theOutputMarks ) ? theOutputMarks.ToString() : "",
-                    defJsonObject.TryGetProperty("OutputHasHeaders", out JsonElement theOutputHasHeaders) && theOutputHasHeaders.GetBoolean()
-                );
-
-
-            }
-            catch(Exception except)
-            {
-                Trace.WriteLine(except);
-                ErrorWindow errorWin = new(except.Message);
-                errorWin.Show();
-                return;
-            }
-
-            // check if loaded file is empty
-            if(columnObjects.Count == 0 )
-            {
-                ErrorWindow errorWin = new("JSON array is empty");
-                errorWin.Show();
-                return;
-            }
-
+            var jsonText = File.ReadAllText(jsonFiles[0]);
             // save Json to application memory
-            //Current.Properties.Add("columnDefs", columnObjects);
-            Current.Properties.Add("csvDef", defObject);
+
+            try
+            {
+                CsvDef? defObject = jsonProceess.processJSON(jsonFiles[0]);
+                Current.Properties.Add("csvDef", defObject);
+            }
+            catch (Exception ex)
+            {
+                ErrorWindow errorWin = new(ex.Message);
+                errorWin.Show();
+                return;
+            }
 
             // Start the main application
             MainWindow main = new();
