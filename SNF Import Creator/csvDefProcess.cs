@@ -141,11 +141,52 @@ namespace SNF_Import_Creator
                 while (!reader.EndOfStream)
                 {
                     string? line = reader.ReadLine();
-                    string[] values = line != null ? line.Split(",") : Array.Empty<string>();
-                    for (int i = 0; i < values.Length; i++)
+                    // BUGFIX: did not account for commas in input fields
+                    //string[] values = line != null ? line.Split(",") : Array.Empty<string>();
+                    //string[] values;
+                    List<string> values= new();
+                    //char quoteChar = '"';
+                    char quoteChar = this.Marks[0];
+                    if (line != null)
                     {
-                        if (values[i].StartsWith('"') && values[i].EndsWith('"')) values[i] = values[i].Substring(1, values[i].Length - 2);
+                        string buffer = "";
+                        bool inQuotes = false;
+                        char? previous = null;
+                        foreach (char c in line)
+                        {
+                            // next column
+                            if (c == ',' && !inQuotes)
+                            {
+                                values.Add(buffer);
+                                buffer = "";
+                            }
+                            // escape catch
+                            else if(c == quoteChar && previous.HasValue && previous == '"')
+                            {
+                                inQuotes = !inQuotes;
+                                buffer += c;
+                            }
+                            // quote catch
+                            else if (c == quoteChar)
+                            {
+                                inQuotes = !inQuotes;
+                            }
+                            // all other values
+                            else
+                            {
+                                buffer += c;
+                            }
+                            previous= c;
+                        }
+                        // Last Catch
+                        if(buffer != "") values.Add(buffer);
                     }
+
+                    // might have been made redundant
+                    //for (int i = 0; i < values.Count; i++)
+                    //{
+                    //    if (values[i].StartsWith('"') && values[i].EndsWith('"')) values[i] = values[i].Substring(1, values[i].Length - 2);
+                    //}
 
                     // generates headers
                     if (firstCase)
@@ -153,12 +194,12 @@ namespace SNF_Import_Creator
                         firstCase = false;
                         if (HasHeaders)
                         {
-                            headers = values.ToList();
+                            headers = values;
                             continue;
                         }
                         else
                         {
-                            for (int i = 0; i < values.Length; i++) headers.Add(i.ToString());
+                            for (int i = 0; i < values.Count; i++) headers.Add(i.ToString());
                         }
                     }
 
