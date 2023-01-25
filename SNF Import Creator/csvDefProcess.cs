@@ -218,10 +218,22 @@ namespace SNF_Import_Creator
         public string ListToCSV(List<Dictionary<string, object>> csv)
         {
             string Output = "";
-            foreach (Dictionary<string, object> column in csv)
+
+            if (this.OutputHasHeaders)
             {
                 string line = "";
-                foreach (KeyValuePair<string, object> kvp in column)
+                Dictionary<string, object> row = csv[0];
+                foreach(KeyValuePair<string, object> kvp in row)
+                {
+                    line += OutputMarks + kvp.Key + OutputMarks + OutputDelimiter;
+                }
+                Output += line.TrimEnd(',') + "\n";
+            }
+
+            foreach (Dictionary<string, object> row in csv)
+            {
+                string line = "";
+                foreach (KeyValuePair<string, object> kvp in row)
                 {
                     line += OutputMarks + kvp.Value + OutputMarks + OutputDelimiter;
                 }
