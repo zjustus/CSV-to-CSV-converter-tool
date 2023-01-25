@@ -74,7 +74,16 @@ namespace SNF_Import_Creator
 							if (string.IsNullOrEmpty(columnDef.InputName)) value = columnDef.Value.ToString();
 							else
 							{
-								value = row[columnDef.InputName];
+								try
+								{
+									value = row[columnDef.InputName];
+
+								}
+								catch(Exception ex){
+                                    ErrorWindow errorWin = new(ex.Message);
+                                    errorWin.Show();
+                                    return;
+                                }
 								// This section applies transformations on the given input and produces a transformed value
 								foreach (JsonElement tf in columnDef.Transformations)
 								{
