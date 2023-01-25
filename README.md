@@ -91,7 +91,8 @@ The value parameter can be a list containing the if then objects that determine 
 		"OutputName": "out2",
 		"value":[
 			{ "if": "Tithes and Offerings", "then": "oneTwoThree"},
-			{ "if": "General Fund", "then": "oneTwoThree"}
+			{ "if": "General Fund", "then": "oneTwoThree"},
+			{ "else": "OptionThree"}
 		]
 	},
 	{

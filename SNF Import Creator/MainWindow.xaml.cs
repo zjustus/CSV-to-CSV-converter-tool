@@ -158,6 +158,15 @@ namespace SNF_Import_Creator
 												break;
 											}
 										}
+										else if(
+											statement.ValueKind == JsonValueKind.Object &&
+                                            statement.TryGetProperty("else", out JsonElement elseValue)
+										)
+										{
+                                            value = elseValue.ToString();
+                                            matchFound = true;
+                                            break;
+                                        }
 									}
 									if (!matchFound) value = "";
 								}
