@@ -1,5 +1,16 @@
-# Elvanto to SNF Import Tool
-This tool converts exported Elvanto Batches into an Shelby Next Financials compatible import file
+# CSV to CSV converter tool
+This tool is designed to transform bulk amounts of CSV data of one format into another using a pre-defined list of parameters. 
+
+## Features
+- Define input and output CSV notation (delimiter, quotations, escapement)
+- Define what columns to keep or remove
+- Manipulate column data using various methods
+  - RegEX clip
+  - Math
+  - Append
+  - Prepend
+- Manipulate column data using if then logical conditions
+- No Code needed. Just modify the JSON
 
 # Application flow
 ## Basic usage
@@ -36,6 +47,7 @@ Note: the order of columns in the final CSV will be in the order the columns def
   - point to csv input file
 - Refresh when def.json file changes
 - Create a def.json builder
+- CSV previewer
 
 # Column parameters
 InputName:  
