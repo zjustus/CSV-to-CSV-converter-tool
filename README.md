@@ -22,6 +22,20 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 
 Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file
 
+# Road Map
+- add ability to insert variables
+- add ability to define variables in array in the def.json
+- add built in environment variables
+  - File Name
+  - File Path?
+  - Day
+  - Month
+  - Year
+- Include command line parameters
+  - point to def.json file
+  - point to csv input file
+- Refresh when def.json file changes
+- Create a def.json builder
 
 # Column parameters
 InputName:  
