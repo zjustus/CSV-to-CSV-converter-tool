@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <RootNamespace>SNF_Import_Creator</RootNamespace>
+    <RootNamespace>CSV_to_CSV</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <NoWin32Manifest>true</NoWin32Manifest>
