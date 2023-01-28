@@ -18,12 +18,14 @@ namespace SNF_Import_Creator
         public string OutputName { get; }
         public JsonElement Value { get; }
         public List<JsonElement> Transformations { get; }
+        public JsonElement? Padding { get; }
 
         public ColumnDef(
             string? InputName = null,
             string? OutputName = null,
             JsonElement? Value = null,
-            List<JsonElement>? Transformations = null
+            List<JsonElement>? Transformations = null,
+            JsonElement? Padding = null
         ) {
 
             // make sure either Input or output contains a value
@@ -58,7 +60,12 @@ namespace SNF_Import_Creator
                             throw new ArgumentException("value array object if property must not be an object or array");
                         if (prop_then.ValueKind == JsonValueKind.Object || prop_then.ValueKind == JsonValueKind.Array)
                             throw new ArgumentException("value array object then property must not be an object or array");
-                    } 
+                    }
+                    else if(x.TryGetProperty("else", out JsonElement prop_else))
+                    {
+                        if (prop_else.ValueKind == JsonValueKind.Object || prop_else.ValueKind == JsonValueKind.Array)
+                            throw new ArgumentException("Value array objecct else property must not be an object or array");
+                    }
                     else throw new ArgumentException("a Value of arrays must contain the property If and Then");
                 }
             }
@@ -84,10 +91,24 @@ namespace SNF_Import_Creator
                 Transformations = new List<JsonElement> { };
             }
 
+            // If Padding exists, make sure its object has the correct properties
+            if( Padding != null)
+            {
+                if (Padding.Value.ValueKind != JsonValueKind.Object)
+                    throw new ArgumentException("Padding must be a JSON Object");
+                if (Padding.Value.TryGetProperty("side", out JsonElement side) && !side.ValueEquals("left") && !side.ValueEquals("right"))
+                    throw new ArgumentException("Padding must contain a side property with a value of left or right");
+                if (Padding.Value.TryGetProperty("char", out JsonElement pChar) && pChar.ValueKind != JsonValueKind.String)
+                    throw new ArgumentException("Padding must contain a char property with a charecter value");
+                if (Padding.Value.TryGetProperty("length", out JsonElement pLength) && pLength.ValueKind != JsonValueKind.Number)
+                    throw new ArgumentException("Padding must contain a length property with a number value");
+            }
+
             this.InputName = InputName ?? "";
             this.OutputName = OutputName ?? "";
             this.Value = (JsonElement)Value;
             this.Transformations = Transformations;
+            this.Padding = Padding;
         }
 
         public override string ToString()

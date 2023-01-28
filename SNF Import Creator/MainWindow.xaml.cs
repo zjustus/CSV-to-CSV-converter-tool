@@ -181,6 +181,29 @@ namespace SNF_Import_Creator
 									value = columnDef.Value.ToString();
 								}
 
+								// This section applys padding logic to the final value
+								if (columnDef.Padding != null)
+								{
+									JsonElement thePadding = columnDef.Padding.Value;
+									
+									// calculate remaining space, throw a fuss if value is too large
+									int remaining = thePadding.GetProperty("length").GetInt32() - value.Length;
+									if(remaining < 0)
+									{
+										ErrorWindow errorWindow = new("WARNING!\nThe value excedes padding space");
+										errorWindow.Show();
+									}
+
+									// construct padding space
+									string padding = "";
+									for (int i = 0; i < remaining; i++) padding += thePadding.GetProperty("char").ToString();
+
+									// append or prepend padding space
+									if (thePadding.GetProperty("side").ToString() == "left")
+										value = padding + value;
+									else value += padding;
+								}
+
 							}
 
 							// This merges or appends to the final CSV
