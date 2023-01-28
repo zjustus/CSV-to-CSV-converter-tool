@@ -20,6 +20,14 @@ This tool transforms CSV data from one format into another given a list of mappe
 ## Advanced notes
 - If multiple JSON files exist in the applications directory it will load only the first one on startup. make sure only one exists.
 
+## Processing order
+When building def.json files it may be useful to know the order of operations for CSV processing
+1. load in input column value if present
+2. apply transformations in order defined by def.json file
+3. apply if then else logic
+4. apply padding logic
+5. insert processed value into the back of the existing output column or create a new one if it docent exist. 
+
 ## Json Sections
 - defTitle - The title of the transformations, displayed on the main window
 - delimiter - what separates the columns
@@ -35,6 +43,7 @@ This tool transforms CSV data from one format into another given a list of mappe
 Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file
 
 # Road Map
+- break processing logic into new file and modularize individual steps for better readability and abstraction
 - add ability to insert variables
 - add ability to define variables in array in the def.json
 - add built in environment variables
@@ -49,6 +58,13 @@ Note: the order of columns in the final CSV will be in the order the columns def
 - Refresh when def.json file changes
 - Create a def.json builder
 - CSV previewer
+
+
+# Variable parameters - In Progress
+This area allows the user to define virtual columns which have the same transformable features as real columns but can be recalled as a variable in column parameters.  
+variables are the same as columns, requiring at the minimum and outputName and a value (following the guidelines specified below)
+
+Variables in the real columns will be parsed before math and regex transformations as well as after after value logic. 
 
 # Column parameters
 inputName:  
