@@ -1,6 +1,17 @@
 # CSV to CSV converter tool
 This tool transforms CSV data from one format into another given a list of mapped fields.
 
+## Features
+- Define input and output CSV notation (delimiter, quotations, escapement)
+- Define what columns to keep or remove
+- Manipulate column data using various methods
+  - RegEX clip
+  - Math
+  - Append
+  - Prepend
+- Manipulate column data using if then logical conditions
+- No Code needed. Just modify the JSON
+
 # Application flow
 ## Basic usage
 - on launch, if the tool does not find a JSON file containing definitions for SNF the tool will create a basic template file and close with a warning prompting you to update this file
@@ -23,6 +34,21 @@ This tool transforms CSV data from one format into another given a list of mappe
 
 Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file
 
+# Road Map
+- add ability to insert variables
+- add ability to define variables in array in the def.json
+- add built in environment variables
+  - File Name
+  - File Path?
+  - Day
+  - Month
+  - Year
+- Include command line parameters
+  - point to def.json file
+  - point to csv input file
+- Refresh when def.json file changes
+- Create a def.json builder
+- CSV previewer
 
 # Column parameters
 inputName:  
