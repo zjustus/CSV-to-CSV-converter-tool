@@ -40,7 +40,7 @@ When building def.json files it may be useful to know the order of operations fo
 - outputHasHeaders - should the output have headers?
 - columns - A list of objects describing each OUTPUT column and how to generate it.
 
-Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file
+Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file  
 
 # Road Map
 - break processing logic into new file and modularize individual steps for better readability and abstraction
@@ -62,9 +62,9 @@ Note: the order of columns in the final CSV will be in the order the columns def
 
 # Variable parameters - In Progress
 This area allows the user to define virtual columns which have the same transformable features as real columns but can be recalled as a variable in column parameters.  
-variables are the same as columns, requiring at the minimum and outputName and a value (following the guidelines specified below)
+variables are the same as columns, requiring at the minimum and outputName and a value (following the guidelines specified below)  
 
-Variables in the real columns will be parsed before math and regex transformations as well as after after value logic. 
+Variables in the real columns will be parsed before math and regex transformations as well as after after value logic.  
 
 # Column parameters
 inputName:  
@@ -82,7 +82,7 @@ transformations:
 Transformations is an array of set rules on how to process the input column value.  
 Each transformation must contain a method and a function value dictating what type of transformation it is, and how to perform it
 Transformations are performed before value logic and require an inputName to be present.  
-The following is a list of methods that can be used.  
+The following is a list of methods that can be used:  
   - math: applies math to the value - {"method": "math", "function": "{ * 100}"}
   - append: appends text to the end of the input - {"method": "append", "function": "End of Line"}
   - prepend: prepends text to the beginning of the input - {"method": "prepend", "function": "Start of Line "}
@@ -95,10 +95,10 @@ It is not required if an InputName is given.
 The value parameter can be a string  
 The value parameter can be a list containing the if then objects that determine the final output.  
 
-padding:
-The padding parameter defines a fixed length of the final value of that column and will fill the remaining space with a specified character.
-If the length is exceeded it will throw a warning but not an error.
-The padding parameter must be an object with the following properties
+padding:  
+The padding parameter defines a fixed length of the final value of that column and will fill the remaining space with a specified character.  
+If the length is exceeded it will throw a warning but not an error.  
+The padding parameter must be an object with the following properties:  
 - side: defines where the padding will be inserted, on the left or right.
 - char: defines what character will be inserted into the padding.
 - length: defines the length of the value. 
