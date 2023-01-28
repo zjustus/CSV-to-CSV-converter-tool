@@ -1,5 +1,5 @@
-# Elvanto to SNF Import Tool
-This tool converts exported Elvanto Batches into an Shelby Next Financials compatible import file
+# CSV to CSV converter tool
+This tool transforms CSV data from one format into another given a list of mapped fields.
 
 # Application flow
 ## Basic usage
@@ -10,32 +10,33 @@ This tool converts exported Elvanto Batches into an Shelby Next Financials compa
 - If multiple JSON files exist in the applications directory it will load only the first one on startup. make sure only one exists.
 
 ## Json Sections
-- Delimiter - what separates the columns
-- TextMarks - Are there quotations around text filed, what are they?
-- Marks - Are there quotations around every field, what are they?
-- HasHeaders - Does the CSV file have headers - if none are present, a number is assigned as its inputName
-- OutputDelimiter - what separates the output columns
-- OutputTextMarks - should there be quotations around text fields, what are they?
-- OutputMarks - should there be quotations around every field, what are they?
-- OutputHasHeaders - should the output have headers?
-- Columns - A list of objects describing each OUTPUT column and how to generate it.
+- defTitle - The title of the transformations, displayed on the main window
+- delimiter - what separates the columns
+- textMarks - Are there quotations around text filed, what are they?
+- marks - Are there quotations around every field, what are they?
+- hasHeaders - Does the CSV file have headers - if none are present, a number is assigned as its inputName
+- outputDelimiter - what separates the output columns
+- outputTextMarks - should there be quotations around text fields, what are they?
+- outputMarks - should there be quotations around every field, what are they?
+- outputHasHeaders - should the output have headers?
+- columns - A list of objects describing each OUTPUT column and how to generate it.
 
 Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file
 
 
 # Column parameters
-InputName:  
+inputName:  
 The input name is the name of the input column the produced value is derived from.  
 If columns do not contain a header, the input name is assigned as a number starting from 0.  
 It is required if there are transformations.  
 It is required if there is if then logic in the value field.  
 It is not required if the produced value is not dependent on an input. 
 
-OutputName:  
+outputName:  
 The Output Name is the name of the output column produced.  
 It is not required if the InputName is given.  
 
-Transformations:  
+transformations:  
 Transformations is an array of set rules on how to process the input column value.  
 Each transformation must contain a method and a function value dictating what type of transformation it is, and how to perform it
 Transformations are performed before value logic and require an inputName to be present.  
@@ -45,7 +46,6 @@ The following is a list of methods that can be used.
   - prepend: prepends text to the beginning of the input - {"method": "prepend", "function": "Start of Line "}
   - regclip: selects only particular parts of text and ignores everything else - {"method": "regclip", "function": "^[^.]*"}
 
-
 value:  
 The value parameter defines a fixed output or a type of "if then" lookup logic to determine the final value.  
 It is applied after transformations take place.  
@@ -53,43 +53,50 @@ It is not required if an InputName is given.
 The value parameter can be a string  
 The value parameter can be a list containing the if then objects that determine the final output.  
 
+padding:
+The padding parameter defines a fixed length of the final value of that column and will fill the remaining space with a specified character.
+If the length is exceeded it will throw a warning but not an error.
+The padding parameter must be an object with the following properties
+- side: defines where the padding will be inserted, on the left or right.
+- char: defines what character will be inserted into the padding.
+- length: defines the length of the value. 
 
 
 # Sample JSON definitions file
 ```JSON
 {
-"DefTitle": "Cool Transformation",
-"Delimiter": ",",
-"TextMarks": "",
-"Marks": "\"",
-"HasHeaders": true,
-"OutputDelimiter": ",",
-"OutputTextMarks": "",
-"OutputMarks": "\"",
-"OutputHasHeaders": false,
-"Columns": [
+"defTitle": "Cool Transformation",
+"delimiter": ",",
+"textMarks": "",
+"marks": "\"",
+"hasHeaders": true,
+"outputDelimiter": ",",
+"outputTextMarks": "",
+"outputMarks": "\"",
+"outputHasHeaders": false,
+"columns": [
 	{
-		"InputName": "Notes",
-		"OutputName": "Cool Notes"
+		"inputName": "Notes",
+		"outputName": "Cool Notes"
 	},
 	{
-		"InputName": "new Giver",
+		"inputName": "new Giver",
 	},
 	{
-		"OutputName": "OrgCode",
+		"outputName": "OrgCode",
 		"value": 1
 	},
 	{
-		"InputName":"Donation Fund",
-		"OutputName": "out1",
+		"inputName":"Donation Fund",
+		"outputName": "out1",
 		"value":[
 			{ "if": "Tithes and Offerings", "then": "oneTwoThree"},
 			{ "if": "General Fund", "then": "oneTwoThree"}
 		]
 	},
 	{
-		"InputName":"Donation Fund",
-		"OutputName": "out2",
+		"inputName":"Donation Fund",
+		"outputName": "out2",
 		"value":[
 			{ "if": "Tithes and Offerings", "then": "oneTwoThree"},
 			{ "if": "General Fund", "then": "oneTwoThree"},
@@ -97,11 +104,12 @@ The value parameter can be a list containing the if then objects that determine 
 		]
 	},
 	{
-		"InputName": "Amount",
-		"Transformations": [
+		"inputName": "Amount",
+		"transformations": [
 			{ "method": "math", "function": " * 100"},
 			{ "method": "regClip", "function": "^[^.]*"}
-		]
+		],
+		"padding":{ "side": "left", "char":"0", "length":9 }
 	}
 ]
 }
