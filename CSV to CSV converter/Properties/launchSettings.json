@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "SNF Import Creator": {
+    "CSV to CSV converter": {
       "commandName": "Project"
     }
   }
