@@ -186,7 +186,7 @@ namespace SNF_Import_Creator
 
             foreach(KeyValuePair<string, string> pair in variables)
             {
-                input.Replace(pair.Key, pair.Value);
+                input = input.Replace(pair.Key, pair.Value);
             }
             return input;
         }

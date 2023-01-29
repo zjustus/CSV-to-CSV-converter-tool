@@ -89,9 +89,6 @@ namespace SNF_Import_Creator
                                     // This section applies padding logic to the final value
                                     value = JsonProcessor.Padding(columnDef, value);
 
-                                    // This section replaces variables with the correct value 
-                                    value = JsonProcessor.VariableParse(value, file);
-
                                 }
 								catch(Exception ex){
                                     ErrorWindow errorWin = new(ex.Message);
@@ -100,8 +97,11 @@ namespace SNF_Import_Creator
                                 }
 							}
 
+                            // This section replaces variables with the correct value 
+                            value = JsonProcessor.VariableParse(value, file);
+
 							// This merges or appends to the final CSV
-							if(outColumn.ContainsKey(columnDef.OutputName)) outColumn[columnDef.OutputName] = (string)outColumn[columnDef.OutputName] + (string)value;
+							if (outColumn.ContainsKey(columnDef.OutputName)) outColumn[columnDef.OutputName] = (string)outColumn[columnDef.OutputName] + (string)value;
 							else outColumn.Add(columnDef.OutputName, value);
 
 						}
