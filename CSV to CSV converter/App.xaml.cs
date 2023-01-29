@@ -92,7 +92,7 @@ namespace SNF_Import_Creator
 
             try
             {
-                CsvDef? defObject = jsonProceess.processJSON(jsonFiles[0]);
+                CsvDef? defObject = JsonProcessor.processJSON(jsonFiles[0]);
                 Current.Properties.Add("csvDef", defObject);
             }
             catch (Exception ex)

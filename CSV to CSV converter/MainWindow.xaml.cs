@@ -80,130 +80,21 @@ namespace SNF_Import_Creator
 								{
 									value = row[columnDef.InputName];
 
-								}
+                                    // This section applies transformations on the given input and produces a transformed value
+                                    value = JsonProcessor.Transform(columnDef, value);
+
+                                    // This section applies value if then logic to the transformed input and produces final value
+                                    value = JsonProcessor.IfThenProcess(columnDef, value);
+
+                                    // This section applys padding logic to the final value
+                                    value = JsonProcessor.Padding(columnDef, value);
+
+                                }
 								catch(Exception ex){
                                     ErrorWindow errorWin = new(ex.Message);
                                     errorWin.Show();
                                     return;
                                 }
-								// This section applies transformations on the given input and produces a transformed value
-								foreach (JsonElement tf in columnDef.Transformations)
-								{
-									try
-									{
-										if (tf.ValueKind == JsonValueKind.Object &&
-											tf.TryGetProperty("method", out JsonElement method) &&
-											tf.TryGetProperty("function", out JsonElement function))
-										{
-											// A transformation for a mathmatical expression, (<operator> <value>)
-											if (method.GetString() == "math" && !string.IsNullOrEmpty(value))
-											{
-												string expression = value + function.GetString();
-												System.Data.DataTable table = new();
-                                                value = table.Compute(expression, "").ToString();
-                                            }
-
-											// appends the input with the given text
-											else if (method.GetString() == "append")
-											{
-												value += function.ToString();
-											}
-
-											// prepends the input with the given text
-											else if (method.GetString() == "prepend")
-											{
-												value = function.ToString() + value;
-
-											}
-
-											// Matches a regex string and returns only what matches
-											else if (method.GetString() == "regClip")
-											{
-
-												MatchCollection matches = Regex.Matches((string)value, function.ToString());
-												value = "";
-												foreach (Match match in matches.Cast<Match>())
-												{
-													value += match.Value;
-												}
-											}
-										}
-									}
-									catch(Exception ex) {
-                                        ErrorWindow errorWin = new(ex.Message);
-                                        errorWin.Show();
-                                        return;
-                                    }
-								}
-
-
-								// This section applies value if then logic to the transformed input and produces final value
-								if (columnDef.Value.ValueKind == JsonValueKind.Array)
-								{
-									bool matchFound = false;
-									foreach (JsonElement statement in columnDef.Value.EnumerateArray())
-									{
-										if (
-											statement.ValueKind == JsonValueKind.Object && 
-											statement.TryGetProperty("if", out JsonElement ifValue) &&
-											statement.TryGetProperty("then", out JsonElement thenValue)
-										){
-											if(
-												ifValue.ValueKind == JsonValueKind.String &&
-												ifValue.ToString() == value.ToString()
-											)
-											{
-												value = thenValue.ToString();
-												matchFound = true;
-												break;
-											}
-										}
-										else if(
-											statement.ValueKind == JsonValueKind.Object &&
-                                            statement.TryGetProperty("else", out JsonElement elseValue)
-										)
-										{
-                                            value = elseValue.ToString();
-                                            matchFound = true;
-                                            break;
-                                        }
-									}
-									if (!matchFound) value = "";
-								}
-                                else if (columnDef.Value.ValueKind == JsonValueKind.Object)
-                                {
-                                    ErrorWindow errorWin = new("Error!\nThe value column can not be an object");
-                                    errorWin.Show();
-                                    return;
-                                }
-                                else if(columnDef.Value.ValueKind != JsonValueKind.Undefined)
-								{
-									value = columnDef.Value.ToString();
-								}
-
-								// This section applys padding logic to the final value
-								if (columnDef.Padding != null)
-								{
-									JsonElement thePadding = columnDef.Padding.Value;
-									
-									// calculate remaining space, throw a fuss if value is too large
-									int remaining = thePadding.GetProperty("length").GetInt32() - value.Length;
-									if(remaining < 0)
-									{
-										ErrorWindow errorWindow = new("WARNING!\nThe value excedes padding space");
-										errorWindow.Show();
-									}
-
-									// construct padding space
-									string padding = "";
-									for (int i = 0; i < remaining; i++) padding += thePadding.GetProperty("char").ToString();
-
-									// append or prepend padding space
-									if (thePadding.GetProperty("side").ToString() == "left")
-										value = padding + value;
-									else value += padding;
-								}
-
 							}
 
 							// This merges or appends to the final CSV
@@ -231,7 +122,7 @@ namespace SNF_Import_Creator
 				{
                     try
                     {
-                        CsvDef? defObject = jsonProceess.processJSON(file);
+                        CsvDef? defObject = JsonProcessor.processJSON(file);
 						Application.Current.Properties["csvDef"] = defObject;
 						if (defObject != null) label_defTitle.Content = defObject.DefTitle;
                     }
