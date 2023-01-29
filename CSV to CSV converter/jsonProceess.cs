@@ -176,5 +176,19 @@ namespace SNF_Import_Creator
 
             return value;
         }
+
+        // TODO: rewrite this later to be OOP 
+        public static string VariableParse(string input, string fileName)
+        {
+            // Variable Dictionary
+            Dictionary<string, string> variables = new();
+            variables.Add("${fileName}", fileName);
+
+            foreach(KeyValuePair<string, string> pair in variables)
+            {
+                input.Replace(pair.Key, pair.Value);
+            }
+            return input;
+        }
     }
 }

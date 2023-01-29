@@ -86,8 +86,11 @@ namespace SNF_Import_Creator
                                     // This section applies value if then logic to the transformed input and produces final value
                                     value = JsonProcessor.IfThenProcess(columnDef, value);
 
-                                    // This section applys padding logic to the final value
+                                    // This section applies padding logic to the final value
                                     value = JsonProcessor.Padding(columnDef, value);
+
+                                    // This section replaces variables with the correct value 
+                                    value = JsonProcessor.VariableParse(value, file);
 
                                 }
 								catch(Exception ex){
