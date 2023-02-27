@@ -111,30 +111,31 @@ namespace SNF_Import_Creator
 
                             standardFormat.Add(outColumn);
                         }
-						else if (isTithly) { }
-						else if(isPushpay) { }
+						else if (isTithly) { } // TODO: Add Tithly Mapping
+						else if(isPushpay) { } // TODO: Add PushPay Mapping
 
                         rowCount++;
 					}
-
-					// Old Save Code
-					//string ccsvOut = csvDef.ListToCSV(output);
-					//SaveFileDialog saveDialog = new();
-					//saveDialog.FileName = Regex.Match(file, @"(?<=\\)[^\\]*$").Value;
-					//saveDialog.DefaultExt = "csv";
-					//saveDialog.Filter = "CSV files (*.csv)|*.csv|Text files (*.txt)|*.txt|All files (*.*)|*.*";
-					//bool isValid = saveDialog.ShowDialog() ?? false;
-
-					//if (isValid) {
-					//	File.WriteAllText(saveDialog.FileName, ccsvOut);
-					//}
 				}
 			}
 
 			// TODO: Add Department totals here
 
-			// TODO: Save Output File Here
+			// TODO: Create final output dict from standard format
 
-		}
+			// Save Output File
+			string csvOut = CsvTools.ListToCSV(standardFormat);
+			SaveFileDialog saveDialog = new();
+			saveDialog.FileName = "SNF_Import_.txt";
+			saveDialog.DefaultExt = "txt";
+            saveDialog.Filter = "Text files (*.txt)|*.txt";
+			bool isValid = saveDialog.ShowDialog() ?? false;
+
+			if(isValid)
+			{
+				File.WriteAllText(saveDialog.FileName, csvOut);
+			}
+
+        }
     }
 }
