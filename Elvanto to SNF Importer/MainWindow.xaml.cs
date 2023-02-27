@@ -81,25 +81,33 @@ namespace SNF_Import_Creator
 							if (rowCount == 0 || rowCount + 1 == csv.Count()) continue;
 							
 							TitheAccount x = defObject.GetFundDetails("elvanto", "Account / Sub Account");
-                            Dictionary<string, object> outColumn = new();
 
 							// Processing
 
-							// Mapping
-							outColumn.Add("Unused1", "00000");
-							outColumn.Add("CO", x.CoNumber);
-							outColumn.Add("Fund", x.FundNumber);
-                            outColumn.Add("Accounting Period", ""); // TODO GET DATE
-                            outColumn.Add("Journal Type", "CN");
-                            outColumn.Add("Journal Number", currentBatch);
-                            outColumn.Add("Unused2", "000");
-							outColumn.Add("Date", ""); // TODO GET DATE FORMAT mmddyy
-                            outColumn.Add("Description1", row["memo"] ?? "");
-                            outColumn.Add("Description2", "");
-                            outColumn.Add("Department", x.DepartmentNumber);
-							outColumn.Add("Account", x.AccountNumber);
-                            outColumn.Add("Account", ""); // TODO: Get Currency
-							outColumn.Add("Project", "");
+							DateTime transactionDate = DateTime.ParseExact(row["Transaction Date"], "yyyy-MM-dd HH-mm:ss", null);
+							int fiscalMonth = ((transactionDate.Month + 5) % 12)+1;
+
+							double amountExact = Convert.ToDouble(row["Amount"]);
+							int amount = Convert.ToInt32(amountExact*-100);
+
+                            // Mapping
+                            Dictionary<string, object> outColumn = new()
+                            {
+                                { "Unused1", "00000" },
+                                { "CO", x.CoNumber },
+                                { "Fund", x.FundNumber },
+                                { "Accounting Period", fiscalMonth.ToString("00")},
+                                { "Journal Type", "CN" },
+                                { "Journal Number", currentBatch },
+                                { "Unused2", "000" },
+                                { "Date", transactionDate.ToString("MMddyy") },
+                                { "Description1", row["memo"] ?? "" },
+                                { "Description2", "" },
+                                { "Department", x.DepartmentNumber },
+                                { "Account", x.AccountNumber },
+                                { "Amount", amount },
+                                { "Project", "" }
+                            };
 
                             standardFormat.Add(outColumn);
                         }
