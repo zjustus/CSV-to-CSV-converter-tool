@@ -10,6 +10,7 @@ This tool transforms CSV data from one format into another given a list of mappe
   - Append
   - Prepend
 - Manipulate column data using if then logical conditions
+- Variable Substititution for unique values
 - No Code needed. Just modify the JSON
 
 # Application flow
@@ -43,21 +44,21 @@ When building def.json files it may be useful to know the order of operations fo
 Note: the order of columns in the final CSV will be in the order the columns defined in list of the JSON file  
 
 # Road Map
-- break processing logic into new file and modularize individual steps for better readability and abstraction
-- add ability to insert variables
-- add ability to define variables in array in the def.json
-- add built in environment variables
-  - File Name
-  - File Path?
-  - Day
-  - Month
-  - Year
-- Include command line parameters
-  - point to def.json file
-  - point to csv input file
-- Refresh when def.json file changes
-- Create a def.json builder
-- CSV previewer
+- [ ] break processing logic into new file and modularize individual steps for better readability and abstraction
+- [X] add ability to insert variables
+- [ ] add ability to define variables in array in the def.json
+- [ ] add built in environment variables
+  - [X] File Name
+  - [ ] File Path?
+  - [ ] Day
+  - [ ] Month
+  - [ ] Year
+- [ ] Include command line parameters
+  - [ ] point to def.json file
+  - [ ] point to csv input file
+- [ ] Refresh when def.json file changes
+- [ ] Create a def.json builder
+- [ ] CSV previewer
 
 
 # Variable parameters - In Progress
@@ -141,7 +142,7 @@ The padding parameter must be an object with the following properties:
 		"outputName": "out2",
 		"value":[
 			{ "if": "Tithes and Offerings", "then": "oneTwoThree"},
-			{ "if": "General Fund", "then": "oneTwoThree"},
+			{ "if": "General Fund}", "then": "oneTwoThree ${fileName"},
 			{ "else": "OptionThree"}
 		]
 	},
