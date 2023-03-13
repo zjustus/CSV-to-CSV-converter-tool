@@ -55,6 +55,8 @@ namespace SNF_Import_Creator
 			//Batch Counters
 			int currentBatch = -1;
             List<Dictionary<string, object>> standardFormat = new();
+            List<Dictionary<string, int>> inputAccountsTotals = new(); //Department:total
+			List<DateTime> despositeDates = new();
 
             // Loop Through All Droped Files
             foreach (string file in dropedFiles)
@@ -63,7 +65,8 @@ namespace SNF_Import_Creator
 				if(Regex.IsMatch(file, @"\b\.csv"))
 				{
 					currentBatch++; //TODO: Dont increment current batch if set to merge!
-
+					inputAccountsTotals.Add(new());
+					DateTime depositeDate = new();
                     //List<ColumnDef>? columnObjects = csvDef.Columns;
                     List<Dictionary<string, string>> csv = CsvTools.stringParse(file);
 
@@ -75,8 +78,9 @@ namespace SNF_Import_Creator
 					int rowCount = 0;
                     foreach (Dictionary<string, string> row in csv)
 					{
-						
-						if (isElvanto) {
+						Dictionary<string, object> outColumn = new();
+
+                        if (isElvanto) {
 							// skip the blank rows
 							if (rowCount == 0 || rowCount + 1 == csv.Count()) continue;
 							
@@ -86,12 +90,14 @@ namespace SNF_Import_Creator
 
 							DateTime transactionDate = DateTime.ParseExact(row["Transaction Date"], "yyyy-MM-dd HH-mm:ss", null);
 							int fiscalMonth = ((transactionDate.Month + 5) % 12)+1;
+							depositeDate = DateTime.ParseExact(row["Deposit Date"], "yyyy-MM-dd HH-mm:ss", null);
 
-							double amountExact = Convert.ToDouble(row["Amount"]);
+
+                            double amountExact = Convert.ToDouble(row["Amount"]);
 							int amount = Convert.ToInt32(amountExact*-100);
 
                             // Mapping
-                            Dictionary<string, object> outColumn = new()
+                            outColumn = new()
                             {
                                 { "Unused1", "00000" },
                                 { "CO", x.CoNumber },
@@ -108,33 +114,69 @@ namespace SNF_Import_Creator
                                 { "Amount", amount },
                                 { "Project", "" }
                             };
-
-                            standardFormat.Add(outColumn);
                         }
 						else if (isTithly) { }
 						else if(isPushpay) { }
 
+						// This section keeps track of Input totals per department per batch
+                        standardFormat.Add(outColumn);
+						// If department exists, apped total
+                        if(inputAccountsTotals[currentBatch].ContainsKey((string)outColumn["Department"])){
+							inputAccountsTotals[currentBatch][(string)outColumn["Department"]] -= (int)outColumn["Amount"];
+                        }
+						// If department does not, create the department with the total
+						else{
+							inputAccountsTotals[currentBatch].Add((string)outColumn["Department"], -(int)outColumn["Amount"]);
+                        }
+
+						// This section stores deoposite data per batch
+						if (despositeDates.Count == currentBatch) despositeDates.Add(depositeDate);
+
                         rowCount++;
 					}
-
-					// Old Save Code
-					//string ccsvOut = csvDef.ListToCSV(output);
-					//SaveFileDialog saveDialog = new();
-					//saveDialog.FileName = Regex.Match(file, @"(?<=\\)[^\\]*$").Value;
-					//saveDialog.DefaultExt = "csv";
-					//saveDialog.Filter = "CSV files (*.csv)|*.csv|Text files (*.txt)|*.txt|All files (*.*)|*.*";
-					//bool isValid = saveDialog.ShowDialog() ?? false;
-
-					//if (isValid) {
-					//	File.WriteAllText(saveDialog.FileName, ccsvOut);
-					//}
 				}
 			}
 
-			// TODO: Add Department totals here
+			// Add Department totals to the list
+            for(int batchNumber = 0; batchNumber < inputAccountsTotals.Count; batchNumber++) {
+                DateTime depositeDate = despositeDates[batchNumber];
+                int fiscalMonth = ((depositeDate.Month + 5) % 12) + 1;
+                foreach (KeyValuePair<string, int> department in inputAccountsTotals[batchNumber]){
+                    Account x = defObject.GetAccountDetails(department.Key);
+                    standardFormat.Add(new()
+                            {
+                                { "Unused1", "00000" },
+                                { "CO", x.CoNumber },
+                                { "Fund", x.FundNumber },
+                                { "Accounting Period", fiscalMonth.ToString("00")},
+                                { "Journal Type", "CN" },
+                                { "Journal Number", batchNumber },
+                                { "Unused2", "000" },
+                                { "Date", depositeDate.ToString("MMddyy") },
+                                { "Description1", "" },
+                                { "Description2", "" },
+                                { "Department", department.Key },
+                                { "Account", x.AccountNumber },
+                                { "Amount", department.Value },
+                                { "Project", "" }
+                            }
+                    );
+                }
+			}
 
-			// TODO: Save Output File Here
 
-		}
+            // TODO: Save Output File Here
+            string csvOut = CsvTools.ListToCSV(standardFormat);
+            SaveFileDialog saveDialog = new();
+            saveDialog.DefaultExt = "txt";
+            saveDialog.Filter = "CSV files (*.csv)|*.csv|Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            bool isValid = saveDialog.ShowDialog() ?? false;
+
+            if (isValid)
+            {
+                File.WriteAllText(saveDialog.FileName, csvOut);
+            }
+
+        }
     }
 }

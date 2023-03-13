@@ -47,6 +47,15 @@ namespace SNF_Import_Creator
             return output;
             
         }
+
+        public Account GetAccountDetails(string department){
+            Account? output = null;
+            foreach(Account i in InputFunds) {
+                if(i.DepartmentNumber == department) output = i;
+            }
+            if (output is null) throw new Exception("A department is not defined in Dictionary");
+            return output;
+        }
     }
 
     internal class Account
