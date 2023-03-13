@@ -115,8 +115,8 @@ namespace SNF_Import_Creator
                                 { "Project", "" }
                             };
                         }
-						else if (isTithly) { }
-						else if(isPushpay) { }
+						else if (isTithly) { } // TODO: Add Tithly Mapping
+						else if(isPushpay) { } // TODO: Add PushPay Mapping
 
 						// This section keeps track of Input totals per department per batch
                         standardFormat.Add(outColumn);
@@ -165,17 +165,20 @@ namespace SNF_Import_Creator
 			}
 
 
-            // TODO: Save Output File Here
-            string csvOut = CsvTools.ListToCSV(standardFormat);
-            SaveFileDialog saveDialog = new();
-            saveDialog.DefaultExt = "txt";
-            saveDialog.Filter = "CSV files (*.csv)|*.csv|Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            bool isValid = saveDialog.ShowDialog() ?? false;
+			// TODO: Create final output dict from standard format
 
-            if (isValid)
-            {
-                File.WriteAllText(saveDialog.FileName, csvOut);
-            }
+			// Save Output File
+			string csvOut = CsvTools.ListToCSV(standardFormat);
+			SaveFileDialog saveDialog = new();
+			saveDialog.FileName = "SNF_Import_.txt";
+			saveDialog.DefaultExt = "txt";
+            saveDialog.Filter = "Text files (*.txt)|*.txt";
+			bool isValid = saveDialog.ShowDialog() ?? false;
+
+			if(isValid)
+			{
+				File.WriteAllText(saveDialog.FileName, csvOut);
+			}
 
         }
     }
