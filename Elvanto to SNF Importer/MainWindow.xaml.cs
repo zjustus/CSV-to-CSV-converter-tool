@@ -138,7 +138,7 @@ namespace SNF_Import_Creator
                                 { "Journal Number", currentBatch },
                                 { "Unused2", "000" },
                                 { "Date", transactionDate.ToString("MMddyy") },
-                                { "Description1", row["memo"] ?? "" },
+                                { "Description1", "Tithly" },
                                 { "Description2", "" },
                                 { "Department", x.DepartmentNumber },
                                 { "Account", x.AccountNumber },
@@ -169,13 +169,14 @@ namespace SNF_Import_Creator
                                 { "Journal Number", currentBatch },
                                 { "Unused2", "000" },
                                 { "Date", transactionDate.ToString("MMddyy") },
-                                { "Description1", row["memo"] ?? "" },
+                                { "Description1", row["Transaction ID"] ?? "" },
                                 { "Description2", "" },
                                 { "Department", x.DepartmentNumber },
                                 { "Account", x.AccountNumber },
                                 { "Amount", amount },
                                 { "Project", "" }
                             };
+                            outColumn["Description1"] = "PushPay: " + (string)outColumn["Description1"];
                         }
 
 						// This section keeps track of Input totals per department per batch
