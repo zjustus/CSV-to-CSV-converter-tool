@@ -115,8 +115,68 @@ namespace SNF_Import_Creator
                                 { "Project", "" }
                             };
                         }
-						else if (isTithly) { } // TODO: Add Tithly Mapping
-						else if(isPushpay) { } // TODO: Add PushPay Mapping
+						else if (isTithly) {
+
+                            TitheAccount x = defObject.GetFundDetails("tithly", "Fund Name");
+                            
+                            // Processing
+                            DateTime transactionDate = DateTime.ParseExact(row["Transaction Date"] + " " + row["Transaction Time"], "yyyy-MM-dd HH:mm tt", null);
+                            int fiscalMonth = ((transactionDate.Month + 5) % 12) + 1;
+                            depositeDate = DateTime.ParseExact(row["Deposit Date"] + " " + row["Deposit Time"], "yyyy-MM-dd HH:mm tt", null);
+
+                            double amountExact = Convert.ToDouble(row["Net Amount"]);
+                            int amount = Convert.ToInt32(amountExact * -100);
+
+                            // Mapping
+                            outColumn = new()
+                            {
+                                { "Unused1", "00000" },
+                                { "CO", x.CoNumber },
+                                { "Fund", x.FundNumber },
+                                { "Accounting Period", fiscalMonth.ToString("00")},
+                                { "Journal Type", "CN" },
+                                { "Journal Number", currentBatch },
+                                { "Unused2", "000" },
+                                { "Date", transactionDate.ToString("MMddyy") },
+                                { "Description1", row["memo"] ?? "" },
+                                { "Description2", "" },
+                                { "Department", x.DepartmentNumber },
+                                { "Account", x.AccountNumber },
+                                { "Amount", amount },
+                                { "Project", "" }
+                            };
+
+                        }
+						else if(isPushpay) {
+                            TitheAccount x = defObject.GetFundDetails("pushpay", "Fund Name");
+
+                            // Processing
+                            DateTime transactionDate = DateTime.ParseExact(row["Created On"] + " " + row["Created Time"], "yyyy-MM-dd HH:mm tt", null);
+                            int fiscalMonth = ((transactionDate.Month + 5) % 12) + 1;
+                            depositeDate = DateTime.ParseExact(row["Received On"], "yyyy-MM-dd", null);
+
+                            double amountExact = Convert.ToDouble(row["Amount"]);
+                            int amount = Convert.ToInt32(amountExact * -100);
+
+                            // Mapping
+                            outColumn = new()
+                            {
+                                { "Unused1", "00000" },
+                                { "CO", x.CoNumber },
+                                { "Fund", x.FundNumber },
+                                { "Accounting Period", fiscalMonth.ToString("00")},
+                                { "Journal Type", "CN" },
+                                { "Journal Number", currentBatch },
+                                { "Unused2", "000" },
+                                { "Date", transactionDate.ToString("MMddyy") },
+                                { "Description1", row["memo"] ?? "" },
+                                { "Description2", "" },
+                                { "Department", x.DepartmentNumber },
+                                { "Account", x.AccountNumber },
+                                { "Amount", amount },
+                                { "Project", "" }
+                            };
+                        }
 
 						// This section keeps track of Input totals per department per batch
                         standardFormat.Add(outColumn);
